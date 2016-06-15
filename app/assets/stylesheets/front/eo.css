@@ -1,0 +1,26 @@
+.members-list {
+    font-size: smaller;
+}
+.project-membership {
+	/*width: 200px;*/
+	display: inline-block;
+	width: auto;
+}
+
+#members > ul > li.item {
+    display: inline-block;
+	margin-left: 0.8em;
+	width: 200px;
+}
+
+#members > ul > li.item > div > div.body > ul > li > div {
+	display: inline-block;
+}
+
+#members > ul > li.item > div > div.header .actions {
+	float: right;
+}
+
+#members > ul > li > div > div.header > * {
+	display: inline-block;
+}

@@ -15,3 +15,59 @@
 <include src="taglibs/auto/rapid/forms"/>
 
 <include src="application"/>
+
+
+<extend tag="card" for="ProjectMembership">
+  <old-card merge>
+    <heading: replace>
+      <h4 param="heading"><view:project/></h4>
+    </heading:>
+    <body:>
+      <ul>
+        <li>Contributor?<view:contributor  if="&!can_edit?"/><editor:contributor if="&can_edit?"/></li>
+        <li>Max layer?<view:maximum_layer if="&!can_edit?"/><editor:maximum_layer if="&can_edit?"/></li>
+        <li>Members: <view:project.members/></li>
+      </ul>
+    </body:>
+  </old-card>
+</extend>
+
+<extend tag="card" for="Project">
+  <old-card merge>
+    <body:>
+      <ul>
+        <li>Members: <view:members/></li>
+      </ul>
+    </body:>
+  </old-card>
+</extend>
+
+
+<extend tag="card" for="Project">
+  <old-card merge>
+    <body:>
+      <ul>
+        <li>Members: <view:members/></li>
+      </ul>
+    </body:>
+  </old-card>
+</extend>
+
+<extend tag="show-page" for="Project">
+  <old-show-page merge>
+	<append-content-body:>
+		<div param="members-list">
+        <h2>Project Members</h2>
+        <collection:project_memberships part="members">
+          <card><heading:><a:user/></heading:></card>
+          </collection>
+        <form:project_memberships.new update="members" reset-form refocus-form>
+          <div>
+            Add a member:
+            <name-one:user/>
+          </div>
+          </form>
+	  </div>
+    </append-content-body:>
+  </old-show-page>
+</extend>

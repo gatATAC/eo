@@ -11,9 +11,15 @@ class User < ActiveRecord::Base
     name          :string, :required, :unique
     email_address :email_address, :login => true
     administrator :boolean, :default => false
+    developer :boolean, :default => false
     timestamps
   end
-  attr_accessible :name, :email_address, :password, :password_confirmation, :current_password
+  attr_accessible :name, :email_address, :password, :password_confirmation, :current_password, :developer
+
+  has_many :projects, :class_name => "Project", :foreign_key => "owner_id", :inverse_of => :owner
+  has_many :project_memberships, :dependent => :destroy, :inverse_of => :user
+  has_many :joined_projects, :through => :project_memberships, :source => :project
+  has_many :contributions, -> { where joined_projects:({ contributor: true })}, :through => :joined_projects
 
   # This gives admin rights and an :active state to the first sign-up.
   # Just remove it if you don't want that
@@ -24,6 +30,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  children :projects
 
   # --- Signup lifecycle --- #
 
@@ -53,7 +60,7 @@ class User < ActiveRecord::Base
 
   def update_permitted?
     acting_user.administrator? ||
-      (acting_user == self && only_changed?(:email_address, :crypted_password,
+      (acting_user == self && only_changed?(:name, :email_address, :crypted_password,
                                             :current_password, :password, :password_confirmation))
     # Note: crypted_password has attr_protected so although it is permitted to change, it cannot be changed
     # directly from a form submission.
