@@ -58,3 +58,8 @@ gem 'hobo_jquery_ui', '2.2.6'
 gem 'hobo_bootstrap_ui', '2.2.6'
 gem 'jquery-ui-themes', '~> 0.0.4'
 gem 'hobo_clean_admin', '2.2.6'
+
+
+
+
+gem 'acts_as_list'

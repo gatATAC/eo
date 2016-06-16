@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160616003210) do
+ActiveRecord::Schema.define(version: 20160616012507) do
 
   create_table "project_memberships", force: :cascade do |t|
     t.boolean  "contributor",   default: false
@@ -45,6 +45,30 @@ ActiveRecord::Schema.define(version: 20160616003210) do
     t.datetime "updated_at"
     t.string   "abbrev"
   end
+
+  create_table "system_types", force: :cascade do |t|
+    t.string   "name"
+    t.string   "abbrev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "systems", force: :cascade do |t|
+    t.string   "name"
+    t.string   "abbrev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "project_id"
+    t.integer  "root_id"
+    t.integer  "parent_id"
+    t.integer  "system_type_id"
+    t.integer  "position"
+  end
+
+  add_index "systems", ["parent_id"], name: "index_systems_on_parent_id"
+  add_index "systems", ["project_id"], name: "index_systems_on_project_id"
+  add_index "systems", ["root_id"], name: "index_systems_on_root_id"
+  add_index "systems", ["system_type_id"], name: "index_systems_on_system_type_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "crypted_password",          limit: 40

@@ -23,6 +23,9 @@ class Project < ActiveRecord::Base
   has_many :contributors, -> { where members:({ contributor: true })}, 
             :through => :members, :source => :joined_projects
   
+  has_many :systems, :dependent => :destroy, :inverse_of => :project
+  
+  children :systems, :members  
   
   # --- Permissions helper --- #
   

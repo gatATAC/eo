@@ -45,7 +45,7 @@
 
 <extend tag="show-page" for="Project">
   <old-show-page merge>
-	<append-content-body:>
+	<members-collection-section:>
 		<div param="members-list">
         <h2>Project Members</h2>
         <collection:project_memberships part="members">
@@ -58,6 +58,6 @@
           </div>
           </form>
 	  </div>
-    </append-content-body:>
+    </members-collection-section:>
   </old-show-page>
 </extend>
