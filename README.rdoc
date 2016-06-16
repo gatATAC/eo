@@ -1,5 +1,7 @@
 == README
 
+Eo is an intent to develop a systems engineering tool.
+
 This README would normally document whatever steps are necessary to get the
 application up and running.
 

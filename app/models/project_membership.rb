@@ -8,10 +8,11 @@ class ProjectMembership < ActiveRecord::Base
     timestamps
   end
   
-  attr_accessible :contributor, :maximum_layer
+  attr_accessible :contributor, :maximum_layer, :role, :role_id
 
   belongs_to :project, :inverse_of => :project_memberships  
   belongs_to :user, :inverse_of => :project_memberships
+  belongs_to :role, :inverse_of => :project_memberships  
 
   validates :project, :presence => :true
   validates :user, :presence => :true
@@ -19,6 +20,10 @@ class ProjectMembership < ActiveRecord::Base
 
   def name
     project.name
+  end
+  
+  def nameandrole
+    ret=user.name+"["+role.abbrev+"]"
   end
   
   # --- Permissions --- #

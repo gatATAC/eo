@@ -10,7 +10,7 @@
 #members > ul > li.item {
     display: inline-block;
 	margin-left: 0.8em;
-	width: 200px;
+	width: 25em;
 }
 
 #members > ul > li.item > div > div.body > ul > li > div {

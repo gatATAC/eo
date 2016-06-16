@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160615212005) do
+ActiveRecord::Schema.define(version: 20160616003210) do
 
   create_table "project_memberships", force: :cascade do |t|
     t.boolean  "contributor",   default: false
@@ -20,9 +20,11 @@ ActiveRecord::Schema.define(version: 20160615212005) do
     t.datetime "updated_at"
     t.integer  "project_id"
     t.integer  "user_id"
+    t.integer  "role_id"
   end
 
   add_index "project_memberships", ["project_id"], name: "index_project_memberships_on_project_id"
+  add_index "project_memberships", ["role_id"], name: "index_project_memberships_on_role_id"
   add_index "project_memberships", ["user_id"], name: "index_project_memberships_on_user_id"
 
   create_table "projects", force: :cascade do |t|
@@ -36,6 +38,13 @@ ActiveRecord::Schema.define(version: 20160615212005) do
   end
 
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id"
+
+  create_table "roles", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "abbrev"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "crypted_password",          limit: 40

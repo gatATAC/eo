@@ -25,23 +25,13 @@
     <body:>
       <ul>
         <li>Contributor?<view:contributor  if="&!can_edit?"/><editor:contributor if="&can_edit?"/></li>
-        <li>Max layer?<view:maximum_layer if="&!can_edit?"/><editor:maximum_layer if="&can_edit?"/></li>
-        <li>Members: <view:project.members/></li>
+        <li>Max layer<view:maximum_layer if="&!can_edit?"/><editor:maximum_layer if="&can_edit?"/></li>
+        <li>Role<view:role if="&!can_edit?"/><editor:role if="&can_edit?"/></li>
+        <li>Members<repeat:project.project_memberships join=", "><a:user/> as <a:role.abbrev/></repeat><else>None</else></li>
       </ul>
     </body:>
   </old-card>
 </extend>
-
-<extend tag="card" for="Project">
-  <old-card merge>
-    <body:>
-      <ul>
-        <li>Members: <view:members/></li>
-      </ul>
-    </body:>
-  </old-card>
-</extend>
-
 
 <extend tag="card" for="Project">
   <old-card merge>
