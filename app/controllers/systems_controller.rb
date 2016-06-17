@@ -2,14 +2,31 @@ class SystemsController < ApplicationController
 
   hobo_model_controller
 
-  auto_actions :all, :except => [:new, :create]
+  auto_actions :all#, :except => [:new, :create]
   auto_actions_for :parent, [:new,:create]
   auto_actions_for :project, [:new,:create]
 
+  def new_for_project
+    hobo_new do
+      if (params[:super_system]) then
+        ss = System.find(params[:super_system])
+        @project = ss.project
+        @this.parent=ss
+        @this.project=ss.project
+        if (@this.parent.root) then
+          @this.root=@this.parent.root
+        else
+          @this.root=@this.parent
+        end
+      end
+      hobo_ajax_response if request.xhr?
+    end
+  end  
+  
   def new
     hobo_new do
       if (params[:super_system]) then
-        ss = SubSystem.find(params[:super_system])
+        ss = System.find(params[:super_system])
         @this.parent=ss
         @this.project=ss.project
         if (@this.parent.root) then

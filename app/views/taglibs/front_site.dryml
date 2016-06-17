@@ -61,7 +61,6 @@
     </members-collection-section:>
   </old-show-page>
 </extend>
-
 <extend tag="show-page" for="System">
   <old-show-page merge>
 
@@ -81,15 +80,11 @@
         </div>
         </p>
 
-        <if test="&can_edit?(this.position_column)">
-          <sortable-collection:children param="children-collection"/>
-        </if>
-        <else>
-          <collection:children param="children-collection"/>
-        </else>
-        <div if="&can_create?(@system.children)">
-          <!--%= link_to "New Sub System in #{@system.name}", :controller => :systems, :action => :new, :super_system => @system %-->
-        </div>
+        <a:project.systems action="new" if="&can_create?(@system.project.systems)" param="new-link" params="&{:super_system =>@system.id}">
+          <ht key="system.actions.new" count="1">
+            New System
+          </ht>
+        </a:project.systems>		
       </section>
     </append-collection-section:>
     <aside:>
@@ -100,3 +95,77 @@
     </aside:>	
   </old-show-page>
 </extend>
+
+<extend tag="show-page" for="Function">
+  <old-show-page merge>
+
+    <field-list: fields="abbrev, function_type, parent, root, project, layer, full_name" param/>
+
+    <append-collection-section:>
+      <section param="children-collection-section">
+        <h3 param="children-collection-heading">
+          <ht key="system.collection.heading" count="&this.children.count" >
+            <human-collection-name collection="children" your/>
+          </ht>
+        </h3>
+        <p><b>Tree:</b>
+        <div id="ajaxtree">
+		  <%= link_to("Diagrama Arbol #{@function.name}", [@function, :only_path => :true, :format => :tree]) %>
+          <embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" />
+        </div>
+        </p>
+
+        <if test="&can_edit?(this.position_column)">
+          <sortable-collection:children param="children-collection"/>
+        </if>
+        <else>
+          <collection:children param="children-collection"/>
+        </else>
+        <div if="&can_create?(@function.children)">
+          <!--%= link_to "New Sub System in #{@system.name}", :controller => :systems, :action => :new, :super_system => @system %-->
+        </div>
+      </section>
+    </append-collection-section:>
+    <aside:>
+	  <%= link_to("Diagrama SVG #{@function.name}", [@function, :only_path => :true, :format => :svg]) %>
+      <embed src="./#{this.id}.svg" type="image/svg+xml" />
+    </aside:>	
+  </old-show-page>
+</extend>
+
+<def tag="new-for-project-page" polymorphic/>
+<def tag="new-for-project-page" for="System">
+  <page merge title="#{ht 'system.new_for_owner.title', :default=>['New System for']} #{name :with => @project} and supersystem=params[:super_system]">
+    <body: class="new-for-owner-page  system" param/>
+
+    <content-header: param>
+      <h2 param="heading">
+        <ht key="system.new_for_owner.heading">
+          New System
+        </ht>
+      </h2>
+      <h3 param="subheading">
+        <ht key="system.new_for_owner.subheading">
+          For:
+        </ht>
+        <a with="&@project"/>
+		
+      </h3>
+    </content-header:>
+
+    <content-body: param>
+		 <% if params[:super_system] then %>
+      <form owner="project" method="post" param>
+         <field-list: skip="project"/>
+        <submit: label="#{ht 'system.actions.create', :default=>['Create System']}"/>
+      </form>
+	 <% else %>
+     <form owner="project" method="post" param>
+        <field-list: skip="project"/>
+       <submit: label="#{ht 'system.actions.create', :default=>['Create System']}"/>
+     </form>
+	 <% end %>
+	  
+    </content-body:>
+  </page>
+</def>

@@ -12,7 +12,7 @@ class System < ActiveRecord::Base
 
   belongs_to :project, :creator => :true
   belongs_to :root, :class_name => 'System'
-  belongs_to :parent,  :creator => true, :foreign_key => :parent_id, :class_name => 'System'
+  belongs_to :parent,  :creator => true, :foreign_key => :parent_id, :class_name => 'System', :inverse_of => :children
   belongs_to :system_type, :inverse_of => :systems
   belongs_to :layer, :inverse_of => :systems
 
@@ -22,7 +22,7 @@ class System < ActiveRecord::Base
   validates :parent_id, confirmation: true, if: "self.parent_id!=self.id"
   validates :layer, :presence => :true
   
-  has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'System'
+  has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'System', :inverse_of => :parent
 
   acts_as_list :scope => :parent
 
@@ -109,32 +109,42 @@ class System < ActiveRecord::Base
   # --- Permissions --- #
 
   def create_permitted?
+=begin    
     if (project) then
       project.updatable_by?(acting_user)
     else
-      false
+      true
     end
+=end
+    true
   end
 
   def update_permitted?
+=begin    
     if project then
       ret=project.updatable_by?(acting_user)
     else
       ret=false
     end
     return ret
+=end
+    true
   end
 
   def destroy_permitted?
+=begin    
     if project then
       ret=project.destroyable_by?(acting_user)
     else
       ret=false
     end
     return ret
+=end
+    true
   end
 
   def view_permitted?(field)
+=begin    
     if project then
       ret=self.project.viewable_by?(acting_user)
       if (!(acting_user.developer? || acting_user.administrator?)) then
@@ -144,6 +154,8 @@ class System < ActiveRecord::Base
       ret=false
     end
     return ret
+=end
+    true
   end
 
 end
