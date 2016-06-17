@@ -11,7 +11,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160616012507) do
+ActiveRecord::Schema.define(version: 20160617021519) do
+
+  create_table "function_types", force: :cascade do |t|
+    t.string   "name"
+    t.string   "abbrev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "functions", force: :cascade do |t|
+    t.string   "name"
+    t.string   "abbrev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "project_id"
+    t.integer  "root_id"
+    t.integer  "parent_id"
+    t.integer  "function_type_id"
+    t.integer  "layer_id"
+    t.integer  "position"
+  end
+
+  add_index "functions", ["function_type_id"], name: "index_functions_on_function_type_id"
+  add_index "functions", ["layer_id"], name: "index_functions_on_layer_id"
+  add_index "functions", ["parent_id"], name: "index_functions_on_parent_id"
+  add_index "functions", ["project_id"], name: "index_functions_on_project_id"
+  add_index "functions", ["root_id"], name: "index_functions_on_root_id"
+
+  create_table "layers", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "level"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "project_memberships", force: :cascade do |t|
     t.boolean  "contributor",   default: false
@@ -63,8 +96,10 @@ ActiveRecord::Schema.define(version: 20160616012507) do
     t.integer  "parent_id"
     t.integer  "system_type_id"
     t.integer  "position"
+    t.integer  "layer_id"
   end
 
+  add_index "systems", ["layer_id"], name: "index_systems_on_layer_id"
   add_index "systems", ["parent_id"], name: "index_systems_on_parent_id"
   add_index "systems", ["project_id"], name: "index_systems_on_project_id"
   add_index "systems", ["root_id"], name: "index_systems_on_root_id"

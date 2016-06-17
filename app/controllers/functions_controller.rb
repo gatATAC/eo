@@ -1,4 +1,4 @@
-class SystemsController < ApplicationController
+class FunctionsController < ApplicationController
 
   hobo_model_controller
 
@@ -8,8 +8,8 @@ class SystemsController < ApplicationController
 
   def new
     hobo_new do
-      if (params[:super_system]) then
-        ss = SubSystem.find(params[:super_system])
+      if (params[:super_function]) then
+        ss = Function.find(params[:super_function])
         @this.parent=ss
         @this.project=ss.project
         if (@this.parent.root) then
@@ -23,7 +23,7 @@ class SystemsController < ApplicationController
   end
   
   def show
-    @system=find_instance
+    @function=find_instance
     respond_to do |format|
       format.sim {
         "render :inline => find_instance.to_sim"
@@ -39,5 +39,5 @@ class SystemsController < ApplicationController
       }
     end
   end
-  
+
 end

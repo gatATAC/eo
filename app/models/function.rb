@@ -1,4 +1,4 @@
-class System < ActiveRecord::Base
+class Function < ActiveRecord::Base
 
   hobo_model # Don't put anything above this
 
@@ -7,27 +7,26 @@ class System < ActiveRecord::Base
     abbrev :string
     timestamps
   end
-  attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :system_type_id, :system_type
+  attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :function_type_id, :function_type
 
 
   belongs_to :project, :creator => :true
-  belongs_to :root, :class_name => 'System'
-  belongs_to :parent,  :creator => true, :foreign_key => :parent_id, :class_name => 'System'
-  belongs_to :system_type, :inverse_of => :systems
-  belongs_to :layer, :inverse_of => :systems
+  belongs_to :root, :class_name => 'Function'
+  belongs_to :parent,  :creator => true, :foreign_key => :parent_id, :class_name => 'Function'
+  belongs_to :function_type, :inverse_of => :functions
+  belongs_to :layer, :inverse_of => :functions
 
   validates :name, :presence => :true
   validates :abbrev, :presence => :true
   validates :project, :presence => :true
   validates :parent_id, confirmation: true, if: "self.parent_id!=self.id"
   validates :layer, :presence => :true
-  
-  has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'System'
+
+  has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'Function'
 
   acts_as_list :scope => :parent
 
   children :children,:children
-
 
   def full_name
     ret=abbrev
@@ -82,9 +81,9 @@ class System < ActiveRecord::Base
 	def has_children?
 	  return children.size > 0
 	end
-  
-  
-  
+
+
+
   def layer_visible_by?(u)
     ret=false
     if self.layer
@@ -104,8 +103,8 @@ class System < ActiveRecord::Base
     end
     return ret
   end
-  
-  
+
+
   # --- Permissions --- #
 
   def create_permitted?

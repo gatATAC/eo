@@ -23,11 +23,11 @@ class AddSystems < ActiveRecord::Migration
     add_index :systems, [:parent_id]
     add_index :systems, [:system_type_id]
     
-    SystemType.create :name => "Complex", :abbrev => "cplx", :value => 1
-    SystemType.create :name => "Optical", :abbrev => "opt", :value => 1
-    SystemType.create :name => "Mechanical", :abbrev => "mech", :value => 1
-    SystemType.create :name => "Electronics", :abbrev => "hw", :value => 1
-    SystemType.create :name => "Software", :abbrev => "sw", :value => 1
+    SystemType.create :name => "Complex", :abbrev => "cplx"
+    SystemType.create :name => "Optical", :abbrev => "opt"
+    SystemType.create :name => "Mechanical", :abbrev => "mech"
+    SystemType.create :name => "Electronics", :abbrev => "hw"
+    SystemType.create :name => "Software", :abbrev => "sw"
 
   end
 

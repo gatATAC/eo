@@ -24,9 +24,11 @@ class Project < ActiveRecord::Base
             :through => :members, :source => :joined_projects
   
   has_many :systems, :dependent => :destroy, :inverse_of => :project
+  has_many :root_systems, -> { where ({ parent: nil })}, :class_name => "System"
+  has_many :functions, :dependent => :destroy, :inverse_of => :project
   
-  children :systems, :members  
-  
+  children :members, :functions, :root_systems
+    
   # --- Permissions helper --- #
   
   def accepts_changes_from?(user)
