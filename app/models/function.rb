@@ -9,7 +9,7 @@ class Function < ActiveRecord::Base
   end
   attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :function_type_id, :function_type
 
-
+  
   belongs_to :project, :creator => :true
   belongs_to :root, :class_name => 'Function'
   belongs_to :parent,  :creator => true, :foreign_key => :parent_id, :class_name => 'Function'
@@ -23,10 +23,14 @@ class Function < ActiveRecord::Base
   validates :layer, :presence => :true
 
   has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'Function'
-
+  has_many :function_dest_links, :foreign_key => :function_src_id, :inverse_of => :function_src, :class_name => 'FunctionLink'
+  has_many :function_src_links, :foreign_key => :function_dest_id, :inverse_of => :function_dest, :class_name => 'FunctionLink'
+  has_many :related_functions, :through => :function_dest_links, :source => :function_dest, :class_name => 'Function'
+    
+    
   acts_as_list :scope => :parent
 
-  children :children,:children
+  children :children,  :related_functions 
 
   def full_name
     ret=abbrev

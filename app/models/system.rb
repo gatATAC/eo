@@ -23,10 +23,15 @@ class System < ActiveRecord::Base
   validates :layer, :presence => :true
   
   has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'System', :inverse_of => :parent
-
+  has_many :system_dest_links, :foreign_key => :system_src_id, :inverse_of => :system_src, :class_name => 'SystemLink'
+  has_many :system_src_links, :foreign_key => :system_dest_id, :inverse_of => :system_dest, :class_name => 'SystemLink'
+    
+  has_many :related_systems, :through => :system_dest_links, :source => :system_dest, :class_name => 'Function'
+    
+    
   acts_as_list :scope => :parent
 
-  children :children,:children
+  children :children,  :related_systems
 
 
   def full_name

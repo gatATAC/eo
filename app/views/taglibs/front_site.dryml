@@ -103,12 +103,10 @@
         </a:project.systems>		
       </section>
     </append-collection-section:>
-    <aside:>
-		hola!
+    <prepend-aside:>
 	  <%= link_to("Diagrama SVG #{@system.name}", [@system, :only_path => :true, :format => :svg]) %>
       <embed src="./#{this.id}.svg" type="image/svg+xml" />
-	  adios!
-    </aside:>	
+    </prepend-aside:>	
   </old-show-page>
 </extend>
 
@@ -175,12 +173,10 @@
         </a:project.functions>		
       </section>
     </append-collection-section:>
-    <aside:>
-		hola!
+    <prepend-aside:>
 	  <%= link_to("Diagrama SVG #{@function.name}", [@function, :only_path => :true, :format => :svg]) %>
       <embed src="./#{this.id}.svg" type="image/svg+xml" />
-	  adios!
-    </aside:>	
+    </prepend-aside:>	
   </old-show-page>
 </extend>
 
