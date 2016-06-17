@@ -156,7 +156,7 @@
     <content-body: param>
 		 <% if params[:super_system] then %>
       <form owner="project" method="post" param>
-         <field-list: skip="project"/>
+         <field-list: skip="project,root,parent"/>
         <submit: label="#{ht 'system.actions.create', :default=>['Create System']}"/>
       </form>
 	 <% else %>
