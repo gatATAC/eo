@@ -82,8 +82,6 @@ class Function < ActiveRecord::Base
 	  return children.size > 0
 	end
 
-
-
   def layer_visible_by?(u)
     ret=false
     if self.layer
@@ -103,16 +101,17 @@ class Function < ActiveRecord::Base
     end
     return ret
   end
-
-
+  
+  
   # --- Permissions --- #
 
-  def create_permitted?
+  def create_permitted?  
     if (project) then
-      project.updatable_by?(acting_user)
+      ret=project.updatable_by?(acting_user)
     else
-      false
+      ret=true
     end
+    return ret
   end
 
   def update_permitted?
@@ -125,7 +124,7 @@ class Function < ActiveRecord::Base
   end
 
   def destroy_permitted?
-    if project then
+  if project then
       ret=project.destroyable_by?(acting_user)
     else
       ret=false
@@ -140,7 +139,7 @@ class Function < ActiveRecord::Base
         ret=self.project.public || self.layer_visible_by?(acting_user)
       end
     else
-      ret=false
+      ret=true
     end
     return ret
   end

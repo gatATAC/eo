@@ -45,7 +45,7 @@
 
 <extend tag="show-page" for="Project">
   <old-show-page merge>
-	<members-collection-section:>
+	<collection-section:>
 		<div param="members-list">
         <h2>Project Members</h2>
         <collection:project_memberships part="members">
@@ -58,9 +58,25 @@
           </div>
           </form>
 	  </div>
-    </members-collection-section:>
+    </collection-section:>
+          <append-root_systems-collection-section:>
+        <a:systems action="new" if="&can_create?(@project.systems)" param="new-link">
+          <ht key="system.actions.new" count="1">
+            New System
+          </ht>
+        </a:systems> 
+      </append-root_systems-collection-section:>
+      <append-functions-collection-section:>
+        <a:functions action="new" if="&can_create?(@project.functions)" param="new-link">
+          <ht key="function.actions.new" count="1">
+            New Function
+          </ht>
+        </a:functions> 
+      </append-functions-collection-section:>
   </old-show-page>
 </extend>
+
+
 <extend tag="show-page" for="System">
   <old-show-page merge>
 
@@ -92,43 +108,6 @@
 	  <%= link_to("Diagrama SVG #{@system.name}", [@system, :only_path => :true, :format => :svg]) %>
       <embed src="./#{this.id}.svg" type="image/svg+xml" />
 	  adios!
-    </aside:>	
-  </old-show-page>
-</extend>
-
-<extend tag="show-page" for="Function">
-  <old-show-page merge>
-
-    <field-list: fields="abbrev, function_type, parent, root, project, layer, full_name" param/>
-
-    <append-collection-section:>
-      <section param="children-collection-section">
-        <h3 param="children-collection-heading">
-          <ht key="system.collection.heading" count="&this.children.count" >
-            <human-collection-name collection="children" your/>
-          </ht>
-        </h3>
-        <p><b>Tree:</b>
-        <div id="ajaxtree">
-		  <%= link_to("Diagrama Arbol #{@function.name}", [@function, :only_path => :true, :format => :tree]) %>
-          <embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" />
-        </div>
-        </p>
-
-        <if test="&can_edit?(this.position_column)">
-          <sortable-collection:children param="children-collection"/>
-        </if>
-        <else>
-          <collection:children param="children-collection"/>
-        </else>
-        <div if="&can_create?(@function.children)">
-          <!--%= link_to "New Sub System in #{@system.name}", :controller => :systems, :action => :new, :super_system => @system %-->
-        </div>
-      </section>
-    </append-collection-section:>
-    <aside:>
-	  <%= link_to("Diagrama SVG #{@function.name}", [@function, :only_path => :true, :format => :svg]) %>
-      <embed src="./#{this.id}.svg" type="image/svg+xml" />
     </aside:>	
   </old-show-page>
 </extend>
@@ -169,3 +148,76 @@
     </content-body:>
   </page>
 </def>
+
+<extend tag="show-page" for="Function">
+  <old-show-page merge>
+
+    <field-list: fields="abbrev, function_type, parent, root, project, layer, full_name" param/>
+
+    <append-collection-section:>
+      <section param="children-collection-section">
+        <h3 param="children-collection-heading">
+          <ht key="function.collection.heading" count="&this.children.count" >
+            <human-collection-name collection="children" your/>
+          </ht>
+        </h3>
+        <p><b>Tree:</b>
+        <div id="ajaxtree">
+		  <%= link_to("Diagrama Arbol #{@function.name}", [@function, :only_path => :true, :format => :tree]) %>
+          <embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" />
+        </div>
+        </p>
+
+        <a:project.functions action="new" if="&can_create?(@function.project.functions)" param="new-link" params="&{:super_function =>@function.id}">
+          <ht key="function.actions.new" count="1">
+            New Function
+          </ht>
+        </a:project.functions>		
+      </section>
+    </append-collection-section:>
+    <aside:>
+		hola!
+	  <%= link_to("Diagrama SVG #{@function.name}", [@function, :only_path => :true, :format => :svg]) %>
+      <embed src="./#{this.id}.svg" type="image/svg+xml" />
+	  adios!
+    </aside:>	
+  </old-show-page>
+</extend>
+
+<def tag="new-for-project-page" polymorphic/>
+<def tag="new-for-project-page" for="Function">
+  <page merge title="#{ht 'function.new_for_owner.title', :default=>['New Function for']} #{name :with => @project} and superfunction=params[:super_function]">
+    <body: class="new-for-owner-page  function" param/>
+
+    <content-header: param>
+      <h2 param="heading">
+        <ht key="function.new_for_owner.heading">
+          New Function
+        </ht>
+      </h2>
+      <h3 param="subheading">
+        <ht key="function.new_for_owner.subheading">
+          For:
+        </ht>
+        <a with="&@project"/>
+		
+      </h3>
+    </content-header:>
+
+    <content-body: param>
+		 <% if params[:super_function] then %>
+      <form owner="project" method="post" param>
+         <field-list: skip="project,root,parent"/>
+        <submit: label="#{ht 'function.actions.create', :default=>['Create Function']}"/>
+      </form>
+	 <% else %>
+     <form owner="project" method="post" param>
+        <field-list: skip="project"/>
+       <submit: label="#{ht 'function.actions.create', :default=>['Create Function']}"/>
+     </form>
+	 <% end %>
+	  
+    </content-body:>
+  </page>
+</def>
+

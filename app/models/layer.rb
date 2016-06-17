@@ -13,6 +13,7 @@ class Layer < ActiveRecord::Base
   validates :level, :presence => :true
   
   has_many :systems, :inverse_of => :layer
+  has_many :functions, :inverse_of => :layer
   
   # --- Permissions --- #
 

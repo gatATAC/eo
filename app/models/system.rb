@@ -108,54 +108,43 @@ class System < ActiveRecord::Base
   
   # --- Permissions --- #
 
-  def create_permitted?
-=begin    
+  def create_permitted?  
     if (project) then
-      project.updatable_by?(acting_user)
+      ret=project.updatable_by?(acting_user)
     else
-      true
+      ret=true
     end
-=end
-    true
+    return ret
   end
 
   def update_permitted?
-=begin    
     if project then
       ret=project.updatable_by?(acting_user)
     else
       ret=false
     end
     return ret
-=end
-    true
   end
 
   def destroy_permitted?
-=begin    
-    if project then
+  if project then
       ret=project.destroyable_by?(acting_user)
     else
       ret=false
     end
     return ret
-=end
-    true
   end
 
   def view_permitted?(field)
-=begin    
     if project then
       ret=self.project.viewable_by?(acting_user)
       if (!(acting_user.developer? || acting_user.administrator?)) then
         ret=self.project.public || self.layer_visible_by?(acting_user)
       end
     else
-      ret=false
+      ret=true
     end
     return ret
-=end
-    true
   end
 
 end

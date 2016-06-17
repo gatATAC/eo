@@ -17,3 +17,4 @@
 /tmp
 app/views/taglibs/auto/**/*
 config/hobo_routes.rb
+/nbproject/private/

@@ -27,7 +27,7 @@ class Project < ActiveRecord::Base
   has_many :root_systems, -> { where ({ parent: nil })}, :class_name => "System"
   has_many :functions, :dependent => :destroy, :inverse_of => :project
   
-  children :root_systems, :members, :functions
+  children :members, :root_systems, :functions
     
   # --- Permissions helper --- #
   
