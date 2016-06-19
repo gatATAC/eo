@@ -17,3 +17,5 @@
 /tmp
 app/views/taglibs/auto/**/*
 config/hobo_routes.rb
+/coverage
+.DS_Store

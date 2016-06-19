@@ -59,7 +59,21 @@ gem 'hobo_bootstrap_ui', '2.2.6'
 gem 'jquery-ui-themes', '~> 0.0.4'
 gem 'hobo_clean_admin', '2.2.6'
 
+####### Testing ########
+gem 'simplecov', :require => false, :group => :test
+group :development, :test do
+  gem 'email_spec'
+  gem 'json_spec'
+  gem 'rspec-rails', '~> 2.14.0'                      # unit testing framework
+  gem 'factory_girl_rails', '~> 4.2.1'                # factories
+  gem 'faker', '~> 1.2.0'                             # data faker
+  gem 'capybara', '~> 2.1.0'                          # behaviour testing framework
+  gem 'database_cleaner', '~> 1.2.0'                  # database cleaner
+  gem 'launchy', '~> 2.3.0'                           # browser launcher
+  gem 'selenium-webdriver', '~> 2.35.1'               # front end testing framework
+  gem 'shoulda'       
+end
 
-
+####### Project dependent gems
 
 gem 'acts_as_list'
