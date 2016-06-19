@@ -1,20 +1,16 @@
-class Layer < ActiveRecord::Base
+class SystemLinkType < ActiveRecord::Base
 
   hobo_model # Don't put anything above this
 
   fields do
-    name  :string
-    level :integer    
+    name :string    
     timestamps
   end
-  attr_accessible :name, :level
 
-  validates :name, :presence => :true
-  validates :level, :presence => :true
-  
-  has_many :systems, :inverse_of => :layer
-  has_many :functions, :inverse_of => :layer
-  
+  attr_accessible 
+
+  has_many :system_links, :inverse_of => :system_link_type  
+
   # --- Permissions --- #
 
   def create_permitted?

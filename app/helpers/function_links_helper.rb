@@ -1,0 +1,2 @@
+module FunctionLinksHelper
+end

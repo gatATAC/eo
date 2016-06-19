@@ -11,7 +11,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160617021519) do
+ActiveRecord::Schema.define(version: 20160617213420) do
+
+  create_table "function_link_types", force: :cascade do |t|
+    t.string   "name"
+    t.string   "abbrev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "function_links", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "function_src_id"
+    t.integer  "function_dest_id"
+    t.integer  "function_link_type_id"
+  end
+
+  add_index "function_links", ["function_dest_id"], name: "index_function_links_on_function_dest_id"
+  add_index "function_links", ["function_link_type_id"], name: "index_function_links_on_function_link_type_id"
+  add_index "function_links", ["function_src_id"], name: "index_function_links_on_function_src_id"
 
   create_table "function_types", force: :cascade do |t|
     t.string   "name"
@@ -78,6 +97,25 @@ ActiveRecord::Schema.define(version: 20160617021519) do
     t.datetime "updated_at"
     t.string   "abbrev"
   end
+
+  create_table "system_link_types", force: :cascade do |t|
+    t.string   "name"
+    t.string   "abbrev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "system_links", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "system_src_id"
+    t.integer  "system_dest_id"
+    t.integer  "system_link_type_id"
+  end
+
+  add_index "system_links", ["system_dest_id"], name: "index_system_links_on_system_dest_id"
+  add_index "system_links", ["system_link_type_id"], name: "index_system_links_on_system_link_type_id"
+  add_index "system_links", ["system_src_id"], name: "index_system_links_on_system_src_id"
 
   create_table "system_types", force: :cascade do |t|
     t.string   "name"

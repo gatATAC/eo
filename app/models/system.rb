@@ -23,10 +23,15 @@ class System < ActiveRecord::Base
   validates :layer, :presence => :true
   
   has_many :children, -> { order "position" }, :foreign_key => :parent_id, :class_name => 'System', :inverse_of => :parent
-
+  has_many :system_dest_links, :foreign_key => :system_src_id, :inverse_of => :system_src, :class_name => 'SystemLink'
+  has_many :system_src_links, :foreign_key => :system_dest_id, :inverse_of => :system_dest, :class_name => 'SystemLink'
+    
+  has_many :related_systems, :through => :system_dest_links, :source => :system_dest, :class_name => 'Function'
+    
+    
   acts_as_list :scope => :parent
 
-  children :children,:children
+  children :children,  :related_systems
 
 
   def full_name
@@ -108,54 +113,43 @@ class System < ActiveRecord::Base
   
   # --- Permissions --- #
 
-  def create_permitted?
-=begin    
+  def create_permitted?  
     if (project) then
-      project.updatable_by?(acting_user)
+      ret=project.updatable_by?(acting_user)
     else
-      true
+      ret=true
     end
-=end
-    true
+    return ret
   end
 
   def update_permitted?
-=begin    
     if project then
       ret=project.updatable_by?(acting_user)
     else
       ret=false
     end
     return ret
-=end
-    true
   end
 
   def destroy_permitted?
-=begin    
-    if project then
+  if project then
       ret=project.destroyable_by?(acting_user)
     else
       ret=false
     end
     return ret
-=end
-    true
   end
 
   def view_permitted?(field)
-=begin    
     if project then
       ret=self.project.viewable_by?(acting_user)
       if (!(acting_user.developer? || acting_user.administrator?)) then
         ret=self.project.public || self.layer_visible_by?(acting_user)
       end
     else
-      ret=false
+      ret=true
     end
     return ret
-=end
-    true
   end
 
 end

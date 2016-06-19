@@ -18,6 +18,9 @@ class SystemsController < ApplicationController
         else
           @this.root=@this.parent
         end
+      else
+        @project=Project.find(params[:project_id])
+        @this.project=@project
       end
       hobo_ajax_response if request.xhr?
     end
