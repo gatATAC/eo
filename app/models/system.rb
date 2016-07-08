@@ -7,14 +7,14 @@ class System < ActiveRecord::Base
     abbrev :string
     timestamps
   end
-  attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :system_type_id, :system_type
-
+  attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :system_type_id, :system_type, :xcos_box, :xcos_box_id
 
   belongs_to :project, :creator => :true
   belongs_to :root, :class_name => 'System'
   belongs_to :parent,  :creator => true, :foreign_key => :parent_id, :class_name => 'System', :inverse_of => :children
   belongs_to :system_type, :inverse_of => :systems
   belongs_to :layer, :inverse_of => :systems
+  has_one :xcos_box, :inverse_of => :system, :dependent => :destroy
 
   validates :name, :presence => :true
   validates :abbrev, :presence => :true
@@ -109,6 +109,72 @@ class System < ActiveRecord::Base
     end
     return ret
   end
+  
+  def self.eox_attributes
+    return [:name, :parent_id, :root_id, :layer_id, :abbrev, :project_id, :system_type_id]
+  end
+  
+  def to_eox_node(doc)
+    doc.eosys do
+      # Attributes
+      doc.name self.name
+      doc.abbrev self.abbrev
+      doc.layer self.layer_id
+      doc.system_type self.system_type_id
+      
+      # Children systems
+      doc.children do
+        self.children.each{|s|
+          s.to_eox_node(doc)
+        }
+      end
+      # Related systems
+      doc.related do
+        self.system_dest_links.each {|rs|
+          doc.link do 
+            doc.id rs.system_dest.id
+            doc.type rs.system_link_type.id
+          end
+        }
+      end
+    end 
+  end
+
+  def to_eox
+    # Create the XML tree
+    b = Nokogiri::XML::Builder.new do |doc|    
+      self.to_eox_node(doc)
+    end
+    return b.to_xml
+  end
+
+  def to_xcos_node(doc,index)
+    if not(xcos_box) then
+      xcos_box=XcosBox.new
+      xcos_box.save
+      xcos_box.to_node(doc,index)
+    end
+  end
+
+  def to_xcos
+    # Create the XML tree
+    b = Nokogiri::XML::Builder.new do |doc|    
+      self.to_xcos_node(doc,0)
+    end
+    return b.to_xml
+  end
+
+  def self.import_attributes
+    ret=System.accessible_attributes.clone
+    ret.delete("project_id")
+    ret.delete("root_id")
+    ret.delete("parent_id")
+    ret.delete("system_type_id")
+    ret.delete("layer_id")
+    ret.delete("position")
+    ret.delete("")
+    return ret
+  end  
   
   
   # --- Permissions --- #

@@ -21,5 +21,14 @@ class ProjectsController < ApplicationController
     end
   end
   
+  def show
+    hobo_show do
+      respond_to do |format|
+        format.html
+        format.eox
+        format.xcos
+      end
+    end
+  end
   
 end

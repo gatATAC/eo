@@ -105,7 +105,66 @@ class Function < ActiveRecord::Base
     end
     return ret
   end
+
+  def to_xcos_node(doc)
+    doc.eofunc do
+      # Attributes
+      doc.name self.name
+      doc.abbrev self.abbrev
+      doc.layer self.layer_id
+      doc.function_type self.function_type_id
+      
+      # Children functions
+      doc.children do
+        self.children.each{|s|
+          s.to_eox_node(doc)
+        }
+      end
+      # Related functions
+      doc.related do
+        self.function_dest_links.each {|rs|
+          doc.link do 
+            doc.id rs.function_dest.id
+            doc.type rs.function_link_type.id
+          end
+        }
+      end
+    end 
+  end
   
+  def to_eox_node(doc)
+    doc.eofunc do
+      # Attributes
+      doc.name self.name
+      doc.abbrev self.abbrev
+      doc.layer self.layer_id
+      doc.function_type self.function_type_id
+      
+      # Children functions
+      doc.children do
+        self.children.each{|s|
+          s.to_eox_node(doc)
+        }
+      end
+      # Related functions
+      doc.related do
+        self.function_dest_links.each {|rs|
+          doc.link do 
+            doc.id rs.function_dest.id
+            doc.type rs.function_link_type.id
+          end
+        }
+      end
+    end 
+  end  
+  
+  def to_eox
+    # Create the XML tree
+    b = Nokogiri::XML::Builder.new do |doc|    
+      self.to_eox_node(doc)
+    end
+    return b.to_xml
+  end  
   
   # --- Permissions --- #
 

@@ -1,0 +1,39 @@
+<h1>Project Items Import</h1>
+
+<p>A text file (CSV), OpenOffice (ODS) or Excel (XLS,XLSX)  file can be used to import records. The first row should be the column name. The following columns are allowed.</p>
+
+<ul>
+  <% System.columns.each do |column| %>
+    <% if column.name.in? [*System.import_attributes] %>
+      <li>
+        <strong><%= column.name %></strong> -
+        <%= column.type.to_s.titleize %> type
+      </li>
+    <% end %>
+  <% end %>
+      <li><strong>parent_abbrev</strong> - String type</li>
+</ul>
+
+
+<%= form_for @project_import do |f| %>
+  <% if @project_import.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@project_import.errors.count, "error") %> prohibited this import from completing:</h2>
+      <ul>
+      <% @project_import.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.file_field :file %>
+    <% if params[:project_id] %>
+      <%= f.hidden_field :project_id , :value =>params[:project_id]%>
+    <% else %>
+      <p><%= f.select :project_id, project_tree_options_for_select(Project.find(:all), :selected => @project_import.project) %></p>
+    <% end %>
+  </div>
+  <div class="buttons"><%= f.submit "Import" %></div>
+<% end %>

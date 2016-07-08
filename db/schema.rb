@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160617213420) do
+ActiveRecord::Schema.define(version: 20160625115105) do
 
   create_table "function_link_types", force: :cascade do |t|
     t.string   "name"
@@ -159,5 +159,13 @@ ActiveRecord::Schema.define(version: 20160617213420) do
   end
 
   add_index "users", ["state"], name: "index_users_on_state"
+
+  create_table "xcos_boxes", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "system_id"
+  end
+
+  add_index "xcos_boxes", ["system_id"], name: "index_xcos_boxes_on_system_id"
 
 end

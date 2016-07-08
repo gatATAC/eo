@@ -59,6 +59,7 @@ gem 'hobo_bootstrap_ui', '2.2.6'
 gem 'jquery-ui-themes', '~> 0.0.4'
 gem 'hobo_clean_admin', '2.2.6'
 
+=begin
 ####### Testing ########
 gem 'simplecov', :require => false, :group => :test
 group :development, :test do
@@ -73,7 +74,13 @@ group :development, :test do
   gem 'selenium-webdriver', '~> 2.35.1'               # front end testing framework
   gem 'shoulda'       
 end
+=end
 
 ####### Project dependent gems
 
 gem 'acts_as_list'
+
+gem 'roo'
+gem 'chartkick'
+gem 'morrisjs-rails'
+gem 'raphael-rails'

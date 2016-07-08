@@ -8,6 +8,7 @@ Mime::Type.register "text/x-c", :h
 Mime::Type.register "application/xml", :cdp
 Mime::Type.register "application/xml", :xcos
 Mime::Type.register "application/xml", :iox
+Mime::Type.register "application/xml", :eox
 Mime::Type.register "text/plain", :iocsv
 Mime::Type.register "application/xls", :ioxls
 Mime::Type.register "application/xls", :xls
