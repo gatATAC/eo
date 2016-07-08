@@ -149,11 +149,12 @@ class System < ActiveRecord::Base
   end
 
   def to_xcos_node(doc,index)
-    if not(xcos_box) then
-      xcos_box=XcosBox.new
-      xcos_box.save
-      xcos_box.to_node(doc,index)
+    if not(self.xcos_box) then
+      self.xcos_box=XcosBox.new
+      self.xcos_box.system=self
+      self.xcos_box.save
     end
+    self.xcos_box.to_node(doc,index)
   end
 
   def to_xcos

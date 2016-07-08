@@ -12,7 +12,7 @@ class XcosBox < ActiveRecord::Base
 
 
   def xcos_id
-    self.system.project.xcos_id+":s"+self.id.to_s
+    self.system.project.xcos_id+":s"+self.system.id.to_s
   end
   
   def xcos_submodel_id
@@ -21,7 +21,7 @@ class XcosBox < ActiveRecord::Base
   
   def xcos_parent
     if self.system.parent
-      self.system.parent
+      self.system.parent.xcos_box
     else
       self.system.project
     end
@@ -48,8 +48,8 @@ class XcosBox < ActiveRecord::Base
     
   
   def to_node(doc,index)
-    doc.SuperBlock id:self.xcos_id, parent:self.xcos_parent.xcos_submodel_id, simulationFunctionType:"DEFAULT", value:self.abbrev do
-      doc.SuperBlockDiagram as:"child", background:"-1", title:self.abbrev do
+    doc.SuperBlock id:self.xcos_id, parent:self.xcos_parent.xcos_submodel_id, simulationFunctionType:"DEFAULT", value:self.system.abbrev do
+      doc.SuperBlockDiagram as:"child", background:"-1", title:self.system.abbrev do
         doc.Array as:"context", scilabClass:"String[]" do
           doc.add value:""
         end
@@ -58,7 +58,7 @@ class XcosBox < ActiveRecord::Base
             doc.mxCell id:self.xcos_id+"modelparent"
             doc.mxCell id:self.xcos_id+"modelchild", parent:self.xcos_id+"modelparent"
             childidx=0
-            self.children.each {|s|
+            self.system.children.each {|s|
               s.to_xcos_node(doc,childidx)
               childidx+=1
             }
@@ -97,7 +97,7 @@ class XcosBox < ActiveRecord::Base
             doc.data column:"5", line:"0", realPart:"450.0"
           end
           doc.ScilabString height:"1", width:"1" do
-            doc.data column:"0", line:"0", value:"#{self.abbrev}"
+            doc.data column:"0", line:"0", value:"#{self.system.abbrev}"
           end
           doc.ScilabDouble height:"7", width:"1" do
             doc.data column:"0", line:"0", realPart:"1.0E-6"
@@ -163,7 +163,7 @@ class XcosBox < ActiveRecord::Base
         doc.Array scilabClass:"ScilabList" do
           ### This list is expanded if current system has children subsystems
           childindex=0
-          self.children.each{ |ss|
+          self.system.children.each{ |ss|
             doc.Array scilabClass:"ScilabMList", varName:"" do
               doc.ScilabString height:"1", width:"5" do
                 doc.data column:"0", line:"0", value:"Block"
@@ -255,7 +255,7 @@ class XcosBox < ActiveRecord::Base
       doc.Array as:"equations", scilabClass:"ScilabList"
       doc.mxGeometry as:"geometry", height:"#{self.xcos_geom_height.to_s}", width:"#{self.xcos_geom_width.to_s}", x:"#{self.xcos_xpos(index).to_s}", y:"#{self.xcos_ypos(index).to_s}"
     end
-    doc.mxCell connectable:"0", id:self.xcos_id+"#identifier", parent:self.xcos_id, style:"noLabel=0;opacity=0", value:self.abbrev, vertex:"1" do
+    doc.mxCell connectable:"0", id:self.xcos_id+"#identifier", parent:self.xcos_id, style:"noLabel=0;opacity=0", value:self.system.abbrev, vertex:"1" do
       doc.mxGeometry as:"geometry", relative:"1", x:"0.5", y:"1.1"
     end
   end
