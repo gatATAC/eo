@@ -1,0 +1,4 @@
+<%=
+ret=@system.to_svg
+raw(ret)
+%>
