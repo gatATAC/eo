@@ -47,6 +47,8 @@ class SystemsController < ApplicationController
     hobo_show do |format|
       format.svg
       format.html
+      format.eox
+      format.tree
     end
   end    
   

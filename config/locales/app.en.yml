@@ -23,3 +23,7 @@ en:
 #    attribute_help:
 #      user:
 #        email_address: We will never share your address with third parties
+
+  system:
+    actions:
+        new_child: New Child System

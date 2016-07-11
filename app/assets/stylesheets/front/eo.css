@@ -24,3 +24,101 @@
 #members > ul > li > div > div.header > * {
 	display: inline-block;
 }
+
+.form-horizontal .control-group {
+    margin-bottom: 0px;
+}
+
+.form-horizontal .control-label {
+    padding-top: 0px;
+    margin-bottom: 0px;
+}
+
+.form-horizontal .controls {
+    padding-top: 0px;
+}
+
+.form-horizontal .span12 {
+    width: auto;
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
+}
+
+.edit-page .form-horizontal{
+    line-height: 33px;
+}
+
+.collection  > li {
+    list-style: outside none none;
+    display: inline-block;
+}
+
+.well {
+    margin-right: 10px;
+    min-height: 20px;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 18px;
+}
+h1, h2, h3 {
+    line-height: 25px; 
+}
+
+h1, h2, h3, h4, h5 {
+    margin-top: 3px;
+    margin-right: 0px;
+    margin-bottom: 3px;
+    margin-left: 0px;  
+}
+
+h4 {
+    font-size: 14px;
+}
+
+.main-row {
+    margin-left: 0px;
+}
+
+.bootstrap-content  {
+    /* margin-right: 10px; */
+    /* margin-left: 10px; */
+    width: 100%;
+}
+
+.aside-column {
+    width: 37%;
+    margin-left: 0px;
+}
+
+.main-column {
+    width: 61%;
+    margin-left: 10px;
+    /* margin-right: 10px; */
+}
+
+.index-page .main-column {
+    width: 100%;
+    margin-left: 10px;
+    /*margin-right: 10px; */
+}
+
+.content {    
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.card .body{
+    font-size: 12px;
+}
+
+.content-body {
+    margin-right: 10px;
+}

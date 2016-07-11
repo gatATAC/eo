@@ -147,7 +147,7 @@ class System < ActiveRecord::Base
       end
       return b.to_xml
     end
-
+    
     def to_xcos_node(doc,index)
       if not(self.xcos_box) then
         self.xcos_box=XcosBox.new
@@ -202,7 +202,7 @@ class System < ActiveRecord::Base
         yoffsetflujo=yoffsetcaja*2+alturacaracter*2
         anchuracaja=200+(self.full_name.length*anchuracaracter)
         alturacaja=(yporflujo*(maxflujos))+(alturacaracter*2)
-        xoffsetcaja=200
+        xoffsetcaja=20
         ycentrocaja=yoffsetflujo+(alturacaja/2)
         xcentrocaja=(anchuracaja/2)+xoffsetcaja
         alturacajaajustada=[alturacaja,yoffsetflujo+yporflujo].max
@@ -241,7 +241,7 @@ class System < ActiveRecord::Base
               id:"rect_#{self.name}",
               style:"fill:none;stroke:#000000;stroke-width:0.34495062;stroke-opacity:1"
             doc.a id:"link_#{self.full_name}",
-              'xlink:href'=>"/sub_systems/#{self.id}",
+              'xlink:href'=>"/systems/#{self.id}",
               'xlink:title'=>"#{self.full_name}", target:"_blank" do
               doc.text_ x:"#{xcentrocaja}", y:"#{ycentrocaja}", id:"text_#{self.name}",
                 'xml:space'=>"preserve", 
@@ -348,6 +348,82 @@ class System < ActiveRecord::Base
       end
       return b.to_xml
     end
+    
+    def to_tree(u)
+      allowed=true
+      if (allowed)
+        # Create the XML tree
+        b = Nokogiri::XML::Builder.new do |doc|
+          #<!DOCTYPE treeview SYSTEM "/Treeview/treeview.dtd">
+          doc.doc.create_internal_subset(
+          'treeview',
+          nil,
+          "/Treeview/treeview.dtd"
+          )
+          self.to_tree_int(doc,u)
+        end
+        xmldoc = b.doc
+        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="/Treeview/treeview.xslt"')
+        xmldoc.root.add_previous_sibling treexsl
+        return b.to_xml
+      else
+        "Not allowed operation"
+      end
+    end
+
+    def to_tree_embedded(u)
+      return to_tree(u)
+    end
+
+  
+    def to_tree_int(doc,u)
+      #allowed=s.view_permitted?
+      allowed=true
+      if allowed
+        doc.treeview title:self.name+" Tree" do
+          self.get_tree_data_xml_ss(doc,u){|n|
+            #link_to(n.name,{:controller=>'nodes', :action=>'show', :id=>n.id}, :target => "main") }
+            doc.a href:"/systems/"+n.id.to_s, target:'main', content:n.name
+          }
+        end
+      else
+        "Not allowed operation 2"
+      end
+    end
+
+    def get_tree_data_xml_ss(doc,u)
+      if self.viewable_by?(u) then
+        if (self.children.size>=1) then
+          img_path="/images/nodes/subsystem.png"
+        else
+          img_path="/images/nodes/mech.png"
+        end
+        doc.folder title:""+self.name,
+          type:"systems",
+          code:""+self.id.to_s,
+          img:img_path,
+          action:""+self.id.to_s do
+=begin
+        self.state_machines.each {|sm|
+          ret+=sm.get_tree_data_xml_sm()
+        }
+
+        self.connectors.each {|cn|
+          ret+=cn.get_tree_data_xml_cn()
+        }
+=end
+        self.children.each {|n|
+          n.get_tree_data_xml_ss(doc,u)
+        }
+=begin
+      self.modes.each {|n|
+        ret+=get_tree_data_xml_md(n)
+      }
+=end
+          end
+      end
+    end
+    
 
     # --- Permissions --- #
 

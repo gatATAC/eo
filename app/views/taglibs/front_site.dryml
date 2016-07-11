@@ -87,12 +87,16 @@
                                 <field-list: fields="abbrev, system_type, parent, root, project, layer, full_name" param/>
 
                                 <append-collection-section:>
-                                    <section param="children-collection-section">
-                                        <h3 param="children-collection-heading">
-                                            <ht key="system.collection.heading" count="&this.children.count" >
-                                                <human-collection-name collection="children" your/>
+                                        <a:project.systems action="new" if="&can_create?(@system.project.systems)" param="new-link" params="&{:super_system =>@system.id}">
+                                            <ht key="system.actions.new_child" count="1">
+                                                New Child System
                                             </ht>
-                                        </h3>
+                                        </a:project.systems>		
+
+                                </append-collection-section:>
+                                <prepend-aside:>
+                                    <%= link_to("Diagrama SVG #{@system.name}", [@system, :only_path => :true, :format => :svg]) %>
+                                    <embed src="./#{this.id}.svg" type="image/svg+xml" />
                                         <p><b>Tree:</b>
                                         <div id="ajaxtree">
                                             <%= link_to("Diagrama Arbol #{@system.name}", [@system, :only_path => :true, :format => :tree]) %>
@@ -100,16 +104,6 @@
                                         </div>
                                         </p>
 
-                                        <a:project.systems action="new" if="&can_create?(@system.project.systems)" param="new-link" params="&{:super_system =>@system.id}">
-                                            <ht key="system.actions.new" count="1">
-                                                New System
-                                            </ht>
-                                        </a:project.systems>		
-                                    </section>
-                                </append-collection-section:>
-                                <prepend-aside:>
-                                    <%= link_to("Diagrama SVG #{@system.name}", [@system, :only_path => :true, :format => :svg]) %>
-                                    <embed src="./#{this.id}.svg" type="image/svg+xml" />
                                 </prepend-aside:>	
                             </old-show-page>
                         </extend>
