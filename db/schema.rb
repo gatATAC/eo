@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160625115105) do
+ActiveRecord::Schema.define(version: 20160712190333) do
 
   create_table "function_link_types", force: :cascade do |t|
     t.string   "name"
@@ -58,6 +58,26 @@ ActiveRecord::Schema.define(version: 20160625115105) do
   add_index "functions", ["project_id"], name: "index_functions_on_project_id"
   add_index "functions", ["root_id"], name: "index_functions_on_root_id"
 
+  create_table "issue_rms", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "project_rm_id"
+    t.integer  "rm_ident"
+    t.string   "subject"
+    t.text     "description"
+    t.integer  "assignee"
+    t.integer  "author"
+    t.integer  "tracker"
+    t.datetime "start_date"
+    t.datetime "due_date"
+    t.integer  "done_ratio"
+    t.boolean  "eosys",         default: false
+    t.integer  "system_id"
+  end
+
+  add_index "issue_rms", ["project_rm_id"], name: "index_issue_rms_on_project_rm_id"
+  add_index "issue_rms", ["system_id"], name: "index_issue_rms_on_system_id"
+
   create_table "layers", force: :cascade do |t|
     t.string   "name"
     t.integer  "level"
@@ -78,6 +98,17 @@ ActiveRecord::Schema.define(version: 20160625115105) do
   add_index "project_memberships", ["project_id"], name: "index_project_memberships_on_project_id"
   add_index "project_memberships", ["role_id"], name: "index_project_memberships_on_role_id"
   add_index "project_memberships", ["user_id"], name: "index_project_memberships_on_user_id"
+
+  create_table "project_rms", force: :cascade do |t|
+    t.string   "rm_url"
+    t.integer  "rm_project"
+    t.string   "rm_apikey"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "project_id"
+  end
+
+  add_index "project_rms", ["project_id"], name: "index_project_rms_on_project_id"
 
   create_table "projects", force: :cascade do |t|
     t.string   "name"

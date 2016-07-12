@@ -84,3 +84,5 @@ gem 'roo'
 gem 'chartkick'
 gem 'morrisjs-rails'
 gem 'raphael-rails'
+
+gem 'redmine_rest'

@@ -1,0 +1,5 @@
+<show-page>
+  <collection: replace>
+    <table-plus:issue_rms fields="this,rm_ident,author,tracker,start_date,due_date,done_ratio,assignee,rm_link,eosys,system"/>
+  </collection:>
+</show-page>

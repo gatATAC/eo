@@ -28,7 +28,7 @@ class System < ActiveRecord::Base
     
     has_many :related_systems, :through => :system_dest_links, :source => :system_dest, :class_name => 'Function'
     
-    
+    has_many :issue_rms, :inverse_of => :system
     acts_as_list :scope => :parent
 
     children :children,  :related_systems
@@ -356,9 +356,9 @@ class System < ActiveRecord::Base
         b = Nokogiri::XML::Builder.new do |doc|
           #<!DOCTYPE treeview SYSTEM "/Treeview/treeview.dtd">
           doc.doc.create_internal_subset(
-          'treeview',
-          nil,
-          "/Treeview/treeview.dtd"
+            'treeview',
+            nil,
+            "/Treeview/treeview.dtd"
           )
           self.to_tree_int(doc,u)
         end
@@ -412,15 +412,15 @@ class System < ActiveRecord::Base
           ret+=cn.get_tree_data_xml_cn()
         }
 =end
-        self.children.each {|n|
-          n.get_tree_data_xml_ss(doc,u)
-        }
+          self.children.each {|n|
+            n.get_tree_data_xml_ss(doc,u)
+          }
 =begin
       self.modes.each {|n|
         ret+=get_tree_data_xml_md(n)
       }
 =end
-          end
+        end
       end
     end
     

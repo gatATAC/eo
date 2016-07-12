@@ -27,8 +27,10 @@ class Project < ActiveRecord::Base
   has_many :root_systems, -> { where ({ parent: nil })}, :class_name => "System"
   has_many :functions, :dependent => :destroy, :inverse_of => :project
   has_many :root_functions, -> { where ({ parent: nil })}, :class_name => "Function"
+
+  has_many :project_rms, :dependent => :destroy, :inverse_of => :project
   
-  children :members, :root_systems, :functions
+  children :members, :root_systems, :functions, :project_rms
     
   def xcos_id
     "root:pr"+id.to_s
