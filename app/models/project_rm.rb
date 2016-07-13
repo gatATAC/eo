@@ -17,15 +17,9 @@ class ProjectRm < ActiveRecord::Base
   
   children :issue_rms
   
-  # API for iac: abfa968eda36e34fd9014ca305f6973dbd1f586d
-  
-  def related_issues_txt
-    return related_issues.to_s
-  end
-  
   def reload_issues
     RedmineRest::Models.configure_models apikey:self.rm_apikey, site:self.rm_url
-    #RedmineRest::Models.configure_models apikey:"abfa968eda36e34fd9014ca305f6973dbd1f586d", site:self.rm_url
+
     extra = []
     extra += self.issue_rms
     all_issues=Issue.all.group_by_project
@@ -61,10 +55,8 @@ class ProjectRm < ActiveRecord::Base
             if f.name=="eosysid" then
               if (f.value) then
                 sysid=Integer(f.value)
-                sys=System.find(sysid)
-                if (sys) then
-                  issue_rm.system=sys
-                end
+                sys=System.find_by_id(sysid)
+                issue_rm.system=sys
               end
             end
           }
