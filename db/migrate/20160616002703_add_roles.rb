@@ -9,6 +9,14 @@ class AddRoles < ActiveRecord::Migration
     add_column :project_memberships, :role_id, :integer
 
     add_index :project_memberships, [:role_id]
+    
+    SystemType.create :name => "Systems Engineer", :abbrev => "sys"    
+    SystemType.create :name => "Project Manager", :abbrev => "pm"
+    SystemType.create :name => "Principal Investigator", :abbrev => "pi"
+    SystemType.create :name => "Optical Engineer", :abbrev => "opt"    
+    SystemType.create :name => "Mechanical Engineer", :abbrev => "mech"
+    SystemType.create :name => "Electronics Engineer", :abbrev => "hw"
+    SystemType.create :name => "Software Engineer", :abbrev => "sw"
   end
 
   def self.down
