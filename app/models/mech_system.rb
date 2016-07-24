@@ -21,7 +21,7 @@ class MechSystem < ActiveRecord::Base
   belongs_to :acquisition_workflow, :inverse_of => :mech_systems
   belongs_to :acquisition_status, :inverse_of => :mech_systems
 
-  has_many :mech_system_fab_machines, :inverse_of => :mech_systems, 
+  has_many :mech_system_fab_machines, :inverse_of => :mech_system, 
     :dependent => :destroy
   
   children :mech_system_fab_machines

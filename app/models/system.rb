@@ -37,7 +37,7 @@ class System < ActiveRecord::Base
   has_many :issue_rms, :inverse_of => :system
   acts_as_list :scope => :parent
 
-  children :children,  :related_systems
+  children :children,  :related_systems, :mech_systems
 
 
   def full_name

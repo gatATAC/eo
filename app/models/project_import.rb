@@ -28,6 +28,7 @@ class ProjectImport
     header = ucanca_sheet.row(1)
     (2..ucanca_sheet.last_row).map do |i|
       row = Hash[[header, ucanca_sheet.row(i)].transpose]
+      print "procesamos -----------> "+row.to_s
       # A system MUST have an abbrev
       rabbrev=row["abbrev"]
       if (rabbrev!=nil && rabbrev!="")
@@ -52,50 +53,52 @@ class ProjectImport
           else
             system.root=system.parent.root
           end
-          
-          # Per discipline treatment
           if (rtype=="Mechanics") then
             systype=SystemType.find_by_name("Mechanical")
-            rfile=row["file_name"]
-            mechsys=system.mech_systems.find_by_file_name(rfile) || MechSystem.new
-            # Mechanical properties import
-            mechsys.file_name = rfile
-            mechtype = MechSystemType.find_by_name(row["mech_system_type"])
-            mechsys.mech_system_type=mechtype
-            opt = MechOpticalSurface.find_by_name(row["optical_surface"])
-            mechsys.mech_optical_surface=opt
-            mat = MechMaterial.find_by_name(row["material"])
-            mechsys.mech_material=mat
-            wf = AcquisitionWorkflow.find_by_name(row["workflow"])
-            mechsys.acquisition_workflow=wf
-            ws = AcquisitionStatus.find_by_name(row["status"])
-            mechsys.acquisition_status=ws
-            if (mechsys.valid?) then
-              mechsys.save!
-              # Mech fabrication machines
-              rmachine=row["machine"]
-              mach=MechMachine.find_by_name(rmachine)
-              if (mach) then
-                mechmach=mechsys.mech_system_fab_machines.find_by_mech_machine_id(mach.id) || MechSystemFabMachine.new
-                mechmach.mech_system = mechsys
-                mechmach.mech_machine=mach
-                if (mechmach.valid?) then
-                  mechmach.save!
-                else
-                  mechmach.errors.full_messages.each do |message|
-                    errors.add :base, "Row #{i+2}: #{message}"
-                  end
-                end
-              end
-            else
-              mechsys.errors.full_messages.each do |message|
-                errors.add :base, "Row #{i+2}: #{message}"
-              end
-            end
           end
           system.system_type=systype
           if (system.valid?)
             system.save!
+            # Per discipline treatment
+            if (rtype=="Mechanics") then
+              rfile=row["file_name"]
+              mechsys=system.mech_systems.find_by_file_name(rfile) || MechSystem.new
+              mechsys.system = system
+              # Mechanical properties import
+              mechsys.file_name = rfile
+              mechtype = MechSystemType.find_by_name(row["mech_system_type"])
+              mechsys.mech_system_type=mechtype
+              opt = MechOpticalSurface.find_by_name(row["optical_surface"])
+              mechsys.mech_optical_surface=opt
+              mat = MechMaterial.find_by_name(row["material"])
+              mechsys.mech_material=mat
+              wf = AcquisitionWorkflow.find_by_name(row["workflow"])
+              mechsys.acquisition_workflow=wf
+              ws = AcquisitionStatus.find_by_name(row["status"])
+              mechsys.acquisition_status=ws
+              if (mechsys.valid?) then
+                mechsys.save!
+                # Mech fabrication machines
+                rmachine=row["main_machine"]
+                mach=MechMachine.find_by_name(rmachine)
+                if (mach) then
+                  mechmach=mechsys.mech_system_fab_machines.find_by_mech_machine_id(mach.id) || MechSystemFabMachine.new
+                  mechmach.mech_system = mechsys
+                  mechmach.mech_machine=mach
+                  if (mechmach.valid?) then
+                    mechmach.save!
+                  else
+                    mechmach.errors.full_messages.each do |message|
+                      errors.add :base, "Row #{i+2}: #{message}"
+                    end
+                  end
+                end
+              else
+                mechsys.errors.full_messages.each do |message|
+                  errors.add :base, "Row #{i+2}: #{message}"
+                end
+              end
+            end
             system
           else
             system.errors.full_messages.each do |message|

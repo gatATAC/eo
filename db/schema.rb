@@ -11,7 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160712190333) do
+ActiveRecord::Schema.define(version: 20160724114028) do
+
+  create_table "acquisition_statuses", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "acquisition_workflow_id"
+  end
+
+  add_index "acquisition_statuses", ["acquisition_workflow_id"], name: "index_acquisition_statuses_on_acquisition_workflow_id"
+
+  create_table "acquisition_workflows", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "function_link_types", force: :cascade do |t|
     t.string   "name"
@@ -84,6 +99,60 @@ ActiveRecord::Schema.define(version: 20160712190333) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "mech_machines", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mech_materials", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mech_optical_surfaces", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mech_system_fab_machines", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "mech_machine_id"
+    t.integer  "mech_system_id"
+  end
+
+  add_index "mech_system_fab_machines", ["mech_machine_id"], name: "index_mech_system_fab_machines_on_mech_machine_id"
+  add_index "mech_system_fab_machines", ["mech_system_id"], name: "index_mech_system_fab_machines_on_mech_system_id"
+
+  create_table "mech_system_types", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mech_systems", force: :cascade do |t|
+    t.string   "file_name"
+    t.string   "version"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "system_id"
+    t.integer  "mech_system_type_id"
+    t.integer  "mech_optical_surface_id"
+    t.integer  "mech_material_id"
+    t.integer  "acquisition_workflow_id"
+    t.integer  "acquisition_status_id"
+  end
+
+  add_index "mech_systems", ["acquisition_status_id"], name: "index_mech_systems_on_acquisition_status_id"
+  add_index "mech_systems", ["acquisition_workflow_id"], name: "index_mech_systems_on_acquisition_workflow_id"
+  add_index "mech_systems", ["mech_material_id"], name: "index_mech_systems_on_mech_material_id"
+  add_index "mech_systems", ["mech_optical_surface_id"], name: "index_mech_systems_on_mech_optical_surface_id"
+  add_index "mech_systems", ["mech_system_type_id"], name: "index_mech_systems_on_mech_system_type_id"
+  add_index "mech_systems", ["system_id"], name: "index_mech_systems_on_system_id"
 
   create_table "project_memberships", force: :cascade do |t|
     t.boolean  "contributor",   default: false
@@ -166,6 +235,8 @@ ActiveRecord::Schema.define(version: 20160712190333) do
     t.integer  "system_type_id"
     t.integer  "position"
     t.integer  "layer_id"
+    t.boolean  "atomic",         default: false
+    t.boolean  "acquired",       default: false
   end
 
   add_index "systems", ["layer_id"], name: "index_systems_on_layer_id"
