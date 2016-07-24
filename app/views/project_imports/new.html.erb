@@ -2,6 +2,7 @@
 
 <p>A text file (CSV), OpenOffice (ODS) or Excel (XLS,XLSX)  file can be used to import records. The first row should be the column name. The following columns are allowed.</p>
 
+<h2>Systems parameters:</h2>
 <ul>
   <% System.columns.each do |column| %>
     <% if column.name.in? [*System.import_attributes] %>
@@ -11,7 +12,26 @@
       </li>
     <% end %>
   <% end %>
+      <li><strong>type</strong> - String type</li>
       <li><strong>parent_abbrev</strong> - String type</li>
+</ul>
+
+<h2>Mech Systems parameters:</h2>
+<ul>
+  <% MechSystem.columns.each do |column| %>
+    <% if column.name.in? [*MechSystem.import_attributes] %>
+      <li>
+        <strong><%= column.name %></strong> -
+        <%= column.type.to_s.titleize %> type
+      </li>
+    <% end %>
+  <% end %>
+      <li><strong>mech_system_type</strong> - String type</li>
+      <li><strong>optical_surface</strong> - String type</li>
+      <li><strong>material</strong> - String type</li>
+      <li><strong>workflow</strong> - String type</li>
+      <li><strong>status</strong> - String type</li>
+      <li><strong>main_machine</strong> - String type</li>
 </ul>
 
 

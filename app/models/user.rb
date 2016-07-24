@@ -36,14 +36,23 @@ class User < ActiveRecord::Base
 
   lifecycle do
 
-    state :active, :default => true
+    state :inactive, :default => true
+    state :active
 
     create :signup, :available_to => "Guest",
-           :params => [:name, :email_address, :password, :password_confirmation],
-           :become => :active
+      :params => [:name, :email_address, :password, :password_confirmation],
+      :become => :inactive, :new_key => true  do
+      UserMailer.activation(self, lifecycle.key).deliver
+    end
+
+    transition :activate, { :inactive => :active }, :available_to => :key_holder
+
+    transition :request_password_reset, { :inactive => :inactive }, :new_key => true do
+      UserMailer.activation(self, lifecycle.key).deliver
+    end
 
     transition :request_password_reset, { :active => :active }, :new_key => true do
-      UserMailer.forgot_password(self, lifecycle.key).deliver_now
+      UserMailer.forgot_password(self, lifecycle.key).deliver
     end
 
     transition :reset_password, { :active => :active }, :available_to => :key_holder,
@@ -51,23 +60,27 @@ class User < ActiveRecord::Base
 
   end
 
+  def signed_up?
+    state=="active"
+  end
+
   # --- Permissions --- #
 
   def create_permitted?
     # Only the initial admin user can be created
-    self.class.count == 0
+    (self.class.count == 0)
   end
 
   def update_permitted?
-    acting_user.administrator? ||
+    (acting_user.administrator? ||
       (acting_user == self && only_changed?(:name, :email_address, :crypted_password,
-                                            :current_password, :password, :password_confirmation))
+                                            :current_password, :password, :password_confirmation)))
     # Note: crypted_password has attr_protected so although it is permitted to change, it cannot be changed
     # directly from a form submission.
   end
 
   def destroy_permitted?
-    acting_user.administrator?
+    (acting_user.administrator?)
   end
 
   def view_permitted?(field)

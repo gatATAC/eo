@@ -1,0 +1,2 @@
+module MechMaterialsHelper
+end

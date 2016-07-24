@@ -1,0 +1,2 @@
+module MechSystemTypesHelper
+end

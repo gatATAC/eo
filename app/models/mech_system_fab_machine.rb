@@ -1,21 +1,15 @@
-class Layer < ActiveRecord::Base
+class MechSystemFabMachine < ActiveRecord::Base
 
   hobo_model # Don't put anything above this
 
   fields do
-    name  :string
-    level :integer    
     timestamps
   end
-  attr_accessible :name, :level
-
-  validates :name, :presence => :true
-  validates :level, :presence => :true
+  attr_accessible :mech_system, :mech_system_id, :mech_machine, :mech_machine_id
   
-  has_many :systems, :inverse_of => :layer
-  has_many :functions, :inverse_of => :layer
-  
-  children :systems, :functions
+  belongs_to :mech_machine, :inverse_of => :mech_system_fab_machines
+  belongs_to :mech_system, :inverse_of => :mech_system_fab_machines, 
+    :creator => :true
   
   # --- Permissions --- #
 

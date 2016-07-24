@@ -3,13 +3,16 @@ class SystemLinkType < ActiveRecord::Base
   hobo_model # Don't put anything above this
 
   fields do
-    name :string    
+    name :string  
+    abbrev :string    
     timestamps
   end
 
-  attr_accessible 
+  attr_accessible :name, :abbrev 
 
-  has_many :system_links, :inverse_of => :system_link_type  
+  has_many :system_links, :inverse_of => :system_link_type
+  
+  children :system_links
 
   # --- Permissions --- #
 

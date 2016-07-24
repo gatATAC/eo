@@ -4,14 +4,16 @@ class FunctionLinkType < ActiveRecord::Base
 
   fields do
     name :string
+    abbrev :string
     timestamps
   end
   
-  attr_accessible 
+  attr_accessible :name, :abbrev 
 
-  has_many :function_links, :inverse_of => :function_link_type  
+  has_many :function_links, :inverse_of => :function_link_type
   
-
+  children :function_links
+  
   # --- Permissions --- #
 
   def create_permitted?

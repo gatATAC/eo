@@ -9,7 +9,9 @@ class FunctionType < ActiveRecord::Base
   end
   attr_accessible :name,:abbrev
   
-  has_many :functions, :inverse_of => :system_type
+  has_many :functions, :inverse_of => :function_type
+  
+  children :functions
 
   # --- Permissions --- #
 

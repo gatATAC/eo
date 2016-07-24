@@ -1,21 +1,18 @@
-class Layer < ActiveRecord::Base
+class AcquisitionWorkflow < ActiveRecord::Base
 
   hobo_model # Don't put anything above this
 
   fields do
-    name  :string
-    level :integer    
+    name :string
     timestamps
   end
-  attr_accessible :name, :level
+  attr_accessible :name
 
-  validates :name, :presence => :true
-  validates :level, :presence => :true
+  has_many :mech_systems, :inverse_of => :acquisition_workflow
+  has_many :acquisition_statuses, :inverse_of => :acquisition_workflow,
+    :dependent => :destroy
   
-  has_many :systems, :inverse_of => :layer
-  has_many :functions, :inverse_of => :layer
-  
-  children :systems, :functions
+  children :acquisition_statuses, :mech_systems
   
   # --- Permissions --- #
 

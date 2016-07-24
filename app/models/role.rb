@@ -10,6 +10,8 @@ class Role < ActiveRecord::Base
   attr_accessible :name, :abbrev
   
   has_many :project_memberships, :inverse_of => :role
+  
+  children :project_memberships
 
   # --- Permissions --- #
 

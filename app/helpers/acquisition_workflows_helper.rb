@@ -1,0 +1,2 @@
+module AcquisitionWorkflowsHelper
+end

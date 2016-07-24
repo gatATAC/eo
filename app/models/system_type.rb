@@ -10,6 +10,8 @@ class SystemType < ActiveRecord::Base
   attr_accessible :name,:abbrev
   
   has_many :systems, :inverse_of => :system_type
+  
+  children :systems
 
   # --- Permissions --- #
 
