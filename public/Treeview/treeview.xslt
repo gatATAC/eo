@@ -102,23 +102,23 @@
                             </xsl:if>
                         </xsl:if>
                         <xsl:if test="not(@virtual='true')">
-                        <img src="{@img}">
-                            <!-- if the attribut alt is present-->
-                            <xsl:if test="@alt">
-                                <!-- if Netscape / Mozilla -->
-                                <xsl:if test="$param-is-netscape='true'">
-                                    <xsl:attribute name="title">
-                                        <xsl:value-of select="@alt"/>
-                                    </xsl:attribute>
+                            <img src="{@img}">
+                                <!-- if the attribut alt is present-->
+                                <xsl:if test="@alt">
+                                    <!-- if Netscape / Mozilla -->
+                                    <xsl:if test="$param-is-netscape='true'">
+                                        <xsl:attribute name="title">
+                                            <xsl:value-of select="@alt"/>
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                    <!-- if Internet Explorer -->
+                                    <xsl:if test="$param-is-netscape='false'">
+                                        <xsl:attribute name="alt">
+                                            <xsl:value-of select="@alt"/>
+                                        </xsl:attribute>
+                                    </xsl:if>
                                 </xsl:if>
-                                <!-- if Internet Explorer -->
-                                <xsl:if test="$param-is-netscape='false'">
-                                    <xsl:attribute name="alt">
-                                        <xsl:value-of select="@alt"/>
-                                    </xsl:attribute>
-                                </xsl:if>
-                            </xsl:if>
-                        </img>
+                            </img>
                             <xsl:if test="@img_atom!=''">
                                 <img src="{@img_atom}"/>
                             </xsl:if>
@@ -151,7 +151,8 @@
                         <xsl:if test="not(@virtual='true')">
                             <xsl:value-of select="@title"/>
                         </xsl:if>
-                    </a>					<!-- Shall we expand all the leaves of the treeview ? no by default-->
+                    </a>					
+                    <!-- Shall we expand all the leaves of the treeview ? no by default-->
                     <xsl:if test="@action">
                         <img src="/images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
@@ -245,23 +246,23 @@
                             </i>
                         </xsl:if>
                         <xsl:if test="not(@virtual='true')">
-                        <img src="{@img}">
-                            <!-- if the attribut alt is present-->
-                            <xsl:if test="@alt">
-                                <!-- if Netscape / Mozilla -->
-                                <xsl:if test="$param-is-netscape='true'">
-                                    <xsl:attribute name="title">
-                                        <xsl:value-of select="@alt"/>
-                                    </xsl:attribute>
+                            <img src="{@img}">
+                                <!-- if the attribut alt is present-->
+                                <xsl:if test="@alt">
+                                    <!-- if Netscape / Mozilla -->
+                                    <xsl:if test="$param-is-netscape='true'">
+                                        <xsl:attribute name="title">
+                                            <xsl:value-of select="@alt"/>
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                    <!-- if Internet Explorer -->
+                                    <xsl:if test="$param-is-netscape='false'">
+                                        <xsl:attribute name="alt">
+                                            <xsl:value-of select="@alt"/>
+                                        </xsl:attribute>
+                                    </xsl:if>
                                 </xsl:if>
-                                <!-- if Internet Explorer -->
-                                <xsl:if test="$param-is-netscape='false'">
-                                    <xsl:attribute name="alt">
-                                        <xsl:value-of select="@alt"/>
-                                    </xsl:attribute>
-                                </xsl:if>
-                            </xsl:if>
-                        </img>
+                            </img>
                             <xsl:if test="@img_atom!=''">
                                 <img src="{@img_atom}"/>
                             </xsl:if>
@@ -271,6 +272,24 @@
                             <xsl:value-of select="@title"/>
                         </xsl:if>
                     </a>
+                    <xsl:if test="@action">
+                        <img src="/images/arrow.png" >
+                            <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
+                                    <xsl:with-param name="text" select="@action"/>
+                                    <xsl:with-param name="from" select="$var-simple-quote"/>
+                                    <xsl:with-param name="to" select="$var-slash-quote"/>
+                                </xsl:call-template>,'<xsl:call-template name="replace-string">
+                                    <xsl:with-param name="text" select="@type"/>
+                                    <xsl:with-param name="from" select="$var-simple-quote"/>
+                                    <xsl:with-param name="to" select="$var-slash-quote"/>
+                                </xsl:call-template>','<xsl:call-template name="replace-string">
+                                    <xsl:with-param name="text" select="@code"/>
+                                    <xsl:with-param name="from" select="$var-simple-quote"/>
+                                    <xsl:with-param name="to" select="$var-slash-quote"/>
+                                </xsl:call-template>')
+                            </xsl:attribute>
+                        </img>
+                    </xsl:if>
                 </td>
             </tr>
         </table>

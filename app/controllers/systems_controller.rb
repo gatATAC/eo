@@ -6,6 +6,9 @@ class SystemsController < ApplicationController
   auto_actions_for :parent, [:new,:create]
   auto_actions_for :project, [:new,:create]
 
+  show_action :pending
+
+  
   def new_for_project
     hobo_new do
       if (params[:super_system]) then
@@ -48,6 +51,13 @@ class SystemsController < ApplicationController
       format.svg
       format.html
       format.eox
+      format.tree
+    end
+  end    
+  
+  def pending
+    @system=find_instance
+    hobo_show do |format|
       format.tree
     end
   end    
