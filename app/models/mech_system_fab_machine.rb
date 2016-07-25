@@ -11,6 +11,9 @@ class MechSystemFabMachine < ActiveRecord::Base
   belongs_to :mech_system, :inverse_of => :mech_system_fab_machines, 
     :creator => :true
   
+  def to_s
+    self.mech_system.to_s + " < " + self.mech_machine.to_s
+  end
   # --- Permissions --- #
 
   def create_permitted?

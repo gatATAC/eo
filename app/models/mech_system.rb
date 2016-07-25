@@ -38,7 +38,9 @@ class MechSystem < ActiveRecord::Base
     return ret
   end  
   
-  
+  def to_s
+    self.system.to_s
+  end
   # --- Permissions --- #
 
   def create_permitted?

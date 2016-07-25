@@ -7,10 +7,11 @@ class System < ActiveRecord::Base
     abbrev :string
     atomic   :boolean
     acquired :boolean
+    virtual :boolean, :default => false
     timestamps
   end
   attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :system_type_id, :system_type, :xcos_box, :xcos_box_id,
-    :acquired, :atomic, :is_part_of_atomic, :is_part_of_acquired
+    :acquired, :atomic, :is_part_of_atomic, :is_part_of_acquired, :virtual, :is_part_of_virtual
 
   belongs_to :project, :creator => :true
   belongs_to :root, :class_name => 'System'
@@ -53,6 +54,14 @@ class System < ActiveRecord::Base
       self.atomic || self.parent.is_part_of_atomic
     else
       self.atomic
+    end
+  end
+  
+  def is_part_of_virtual
+    if self.parent then
+      self.virtual || self.parent.is_part_of_virtual
+    else
+      self.virtual
     end
   end
   
@@ -277,93 +286,93 @@ class System < ActiveRecord::Base
           acuminput=0
           acumoutput=0
 =begin
-          self.connectors.each {|c|
+        self.connectors.each {|c|
 
-            contador=acuminput+1;
-            c.input_flows.each {|f|
-              doc.rect width:"#{anchuracaracter*(f.label.length+2)}", height:"1",
-              x:"#{xoffsetcaja-(anchuracaracter*(f.label.length+2))}",
-              y:"#{(yporflujo*(contador-1))+yoffsetflujo}",
-              id:"line_#{f.label}",
-              style:"fill:none;stroke:#000000;stroke-width:0.65142924;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-              doc.a 'xlink:href'=>"/flows/#{f.flow.id}", 'xlink:title'=>"#{f.label}", target:"_blank" do
-                doc.text_ x:"#{xoffsetcaja-anchuracaracter}",
-                y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}",
-                id:"text_#{f.label}",
-                'xml:space'=>"preserve",
-                style:"font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
-                  doc.tspan x:"#{xoffsetcaja-anchuracaracter}",
-                  y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}"
-                  id:"tspan_#{f.label}" do
-                    doc.text "#{f.label}"
-                  end     
+          contador=acuminput+1;
+          c.input_flows.each {|f|
+            doc.rect width:"#{anchuracaracter*(f.label.length+2)}", height:"1",
+            x:"#{xoffsetcaja-(anchuracaracter*(f.label.length+2))}",
+            y:"#{(yporflujo*(contador-1))+yoffsetflujo}",
+            id:"line_#{f.label}",
+            style:"fill:none;stroke:#000000;stroke-width:0.65142924;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+            doc.a 'xlink:href'=>"/flows/#{f.flow.id}", 'xlink:title'=>"#{f.label}", target:"_blank" do
+              doc.text_ x:"#{xoffsetcaja-anchuracaracter}",
+              y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}",
+              id:"text_#{f.label}",
+              'xml:space'=>"preserve",
+              style:"font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
+                doc.tspan x:"#{xoffsetcaja-anchuracaracter}",
+                y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}"
+                id:"tspan_#{f.label}" do
+                  doc.text "#{f.label}"
+                end     
+              end
+            end
+            contador=contador+1
+          }
+          alturaconector=((contador-acuminput-1)*yporflujo)-(yoffsetconector/2)
+          yoffsetconectorinput=((acuminput*yporflujo)+yoffsetcaja)+(yoffsetconector)
+          ycentroconectorinput=yoffsetconectorinput+(alturaconector/2)
+          if (acuminput!=contador-1) then
+            doc.rect width:"#{anchuraconector}",
+            height:"#{alturaconector}", x:"#{xoffsetconectorinput}", y:"#{yoffsetconectorinput}",
+            id:"rect_#{c.name}",
+            style:"fill:none;stroke:#000000;stroke-width:0.34495062;stroke-opacity:1"
+            doc.a id:"link_#{c.full_name}", 'xlink:href'=>"/connectors/#{c.id}", 'xlink:title'=>"#{c.full_name}", target:"_blank" do
+              doc.text_ x:"#{xcentroconectorinput}", y:"#{ycentroconectorinput}",
+              id:"text_#{c.name}", 'xml:space'=>"preserve",
+              style:"font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
+                doc.tspan x:"#{xcentroconectorinput}", y:"#{ycentroconectorinput}",
+                id:"tspan_#{c.name}" do
+                  doc.text="#{c.name}"
                 end
               end
-              contador=contador+1
-            }
-            alturaconector=((contador-acuminput-1)*yporflujo)-(yoffsetconector/2)
-            yoffsetconectorinput=((acuminput*yporflujo)+yoffsetcaja)+(yoffsetconector)
-            ycentroconectorinput=yoffsetconectorinput+(alturaconector/2)
-            if (acuminput!=contador-1) then
-              doc.rect width:"#{anchuraconector}",
-              height:"#{alturaconector}", x:"#{xoffsetconectorinput}", y:"#{yoffsetconectorinput}",
-              id:"rect_#{c.name}",
-              style:"fill:none;stroke:#000000;stroke-width:0.34495062;stroke-opacity:1"
-              doc.a id:"link_#{c.full_name}", 'xlink:href'=>"/connectors/#{c.id}", 'xlink:title'=>"#{c.full_name}", target:"_blank" do
-                doc.text_ x:"#{xcentroconectorinput}", y:"#{ycentroconectorinput}",
+            end
+          end
+          acuminput=contador-1
+          contador=acumoutput+1;
+          c.output_flows.each {|f|
+            doc.rect width:"#{anchuracaracter*(f.label.length+2)}",
+            height:"1", x:"#{xoffsetcaja+anchuracaja}", y:"#{(yporflujo*(contador-1))+yoffsetflujo}",
+            id:"line_#{f.label}", 
+            style:"fill:none;stroke:#000000;stroke-width:0.65142924;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+            doc.a 'xlink:href'=>"/flows/#{f.flow.id}", 'xlink:title'=>"#{f.label}", target:"_blank" do
+              doc.text_ x:"#{xoffsetcaja+anchuracaja+anchuracaracter}",
+              y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}",
+              id:"text_#{f.label}", 'xml:space'=>"preserve",
+              style:"font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
+                doc.tspan x:"#{xoffsetcaja+anchuracaja+anchuracaracter}",
+                y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}",
+                id:"tspan_#{f.label}" do
+                  doc.text "#{f.label}"
+                end
+              end
+            end
+            contador=contador+1
+          }
+          alturaconector=((contador-acumoutput-1)*yporflujo)-(yoffsetconector/2)
+          yoffsetconectoroutput=((acumoutput*yporflujo)+yoffsetcaja)+(yoffsetconector)
+          ycentroconectoroutput=yoffsetconectoroutput+(alturaconector/2)
+          if (acumoutput!=contador-1) then
+            doc.rect width:"#{anchuraconector}", height:"#{alturaconector}",
+            x:"#{xoffsetconectoroutput}", y:"#{yoffsetconectoroutput}",
+            id:"rect_#{c.name}",
+            style:"fill:none;stroke:#000000;stroke-width:0.34495062;stroke-opacity:1" do
+              doc.a id:"link_#{c.full_name}", 'xlink:href'=>"/connectors/#{c.id}",
+              'xlink:title'=>"#{c.full_name}", target:"_blank" do
+                doc.text_ x:"#{xcentroconectoroutput}", y:"#{ycentroconectoroutput}",
                 id:"text_#{c.name}", 'xml:space'=>"preserve",
                 style:"font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
-                  doc.tspan x:"#{xcentroconectorinput}", y:"#{ycentroconectorinput}",
-                  id:"tspan_#{c.name}" do
-                    doc.text="#{c.name}"
+                  doc.tspan x:"#{xcentroconectoroutput}", y:"#{ycentroconectoroutput}",
+                  id:"tspan_#{c.name} " do 
+                    doc.text "#{c.name}"
                   end
                 end
-              end
-            end
-            acuminput=contador-1
-            contador=acumoutput+1;
-            c.output_flows.each {|f|
-              doc.rect width:"#{anchuracaracter*(f.label.length+2)}",
-              height:"1", x:"#{xoffsetcaja+anchuracaja}", y:"#{(yporflujo*(contador-1))+yoffsetflujo}",
-              id:"line_#{f.label}", 
-              style:"fill:none;stroke:#000000;stroke-width:0.65142924;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-              doc.a 'xlink:href'=>"/flows/#{f.flow.id}", 'xlink:title'=>"#{f.label}", target:"_blank" do
-                doc.text_ x:"#{xoffsetcaja+anchuracaja+anchuracaracter}",
-                y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}",
-                id:"text_#{f.label}", 'xml:space'=>"preserve",
-                style:"font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
-                  doc.tspan x:"#{xoffsetcaja+anchuracaja+anchuracaracter}",
-                  y:"#{(yporflujo*(contador-1))+(yoffsetflujo-alturacaracter)}",
-                  id:"tspan_#{f.label}" do
-                    doc.text "#{f.label}"
-                  end
-                end
-              end
-              contador=contador+1
-            }
-            alturaconector=((contador-acumoutput-1)*yporflujo)-(yoffsetconector/2)
-            yoffsetconectoroutput=((acumoutput*yporflujo)+yoffsetcaja)+(yoffsetconector)
-            ycentroconectoroutput=yoffsetconectoroutput+(alturaconector/2)
-            if (acumoutput!=contador-1) then
-              doc.rect width:"#{anchuraconector}", height:"#{alturaconector}",
-              x:"#{xoffsetconectoroutput}", y:"#{yoffsetconectoroutput}",
-              id:"rect_#{c.name}",
-              style:"fill:none;stroke:#000000;stroke-width:0.34495062;stroke-opacity:1" do
-                doc.a id:"link_#{c.full_name}", 'xlink:href'=>"/connectors/#{c.id}",
-                'xlink:title'=>"#{c.full_name}", target:"_blank" do
-                  doc.text_ x:"#{xcentroconectoroutput}", y:"#{ycentroconectoroutput}",
-                  id:"text_#{c.name}", 'xml:space'=>"preserve",
-                  style:"font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans" do
-                    doc.tspan x:"#{xcentroconectoroutput}", y:"#{ycentroconectoroutput}",
-                    id:"tspan_#{c.name} " do 
-                      doc.text "#{c.name}"
-                    end
-                  end
-                end 
-              end   
-            end
-            acumoutput=contador-1
-          }
+              end 
+            end   
+          end
+          acumoutput=contador-1
+        }
 =end            
         end
       end
@@ -417,8 +426,10 @@ class System < ActiveRecord::Base
     if self.viewable_by?(u) then
       if (self.children.size>=1) then
         img_path="/images/nodes/subsystem.png"
+        nodetype=:folder
       else
-        img_path="/images/nodes/mech.png"
+        img_path="/images/nodes/component.png"
+        nodetype=:leaf
       end
       if (self.is_part_of_atomic) then
         img_path_atom="/images/nodes/atom.png"
@@ -430,30 +441,48 @@ class System < ActiveRecord::Base
       else
         img_path_done=""
       end
-      doc.folder title:""+self.name,
-        type:"systems",
-        code:""+self.id.to_s,
-        img:img_path,
-        img_atom:img_path_atom,
-        img_done:img_path_done,
-        action:""+self.id.to_s do
+      if (self.is_part_of_virtual) then
+        virtstr="true"
+      else
+        virtstr="false"
+      end
+      if (nodetype==:folder) then
+        doc.folder title:""+self.name,
+          type:"systems",
+          code:""+self.id.to_s,
+          img:img_path,
+          img_atom:img_path_atom,
+          img_done:img_path_done,
+          virtual:virtstr,
+          action:""+self.id.to_s do
 =begin
-      self.state_machines.each {|sm|
-        ret+=sm.get_tree_data_xml_sm()
-      }
+    self.state_machines.each {|sm|
+      ret+=sm.get_tree_data_xml_sm()
+    }
 
-      self.connectors.each {|cn|
-        ret+=cn.get_tree_data_xml_cn()
-      }
-=end
-        self.children.each {|n|
-          n.get_tree_data_xml_ss(doc,u)
-        }
-=begin
-    self.modes.each {|n|
-      ret+=get_tree_data_xml_md(n)
+    self.connectors.each {|cn|
+      ret+=cn.get_tree_data_xml_cn()
     }
 =end
+          self.children.each {|n|
+            n.get_tree_data_xml_ss(doc,u)
+          }
+=begin
+  self.modes.each {|n|
+    ret+=get_tree_data_xml_md(n)
+  }
+=end
+        end
+      else
+        doc.leaf title:""+self.name,
+          type:"systems",
+          code:""+self.id.to_s,
+          img:img_path,
+          img_atom:img_path_atom,
+          img_done:img_path_done,
+          virtual:virtstr,
+          action:""+self.id.to_s do
+        end
       end
     end
   end

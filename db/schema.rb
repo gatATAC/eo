@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160724114028) do
+ActiveRecord::Schema.define(version: 20160725121258) do
 
   create_table "acquisition_statuses", force: :cascade do |t|
     t.string   "name"
@@ -237,6 +237,7 @@ ActiveRecord::Schema.define(version: 20160724114028) do
     t.integer  "layer_id"
     t.boolean  "atomic",         default: false
     t.boolean  "acquired",       default: false
+    t.boolean  "virtual",        default: false
   end
 
   add_index "systems", ["layer_id"], name: "index_systems_on_layer_id"
