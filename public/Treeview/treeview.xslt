@@ -118,6 +118,12 @@
                                 </xsl:if>
                             </xsl:if>
                         </img>
+                        <xsl:if test="@img_atom!=''">
+                            <img src="{@img_atom}"/>
+                        </xsl:if>
+                        <xsl:if test="@img_done!=''">
+                            <img src="{@img_done}"/>
+                        </xsl:if>
                     </a>
                     <a class="folder">
                         <xsl:attribute name="onclick">selectLeaf('<xsl:call-template name="replace-string">

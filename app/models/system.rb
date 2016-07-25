@@ -10,7 +10,7 @@ class System < ActiveRecord::Base
     timestamps
   end
   attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :system_type_id, :system_type, :xcos_box, :xcos_box_id,
-    :acquired, :atomic
+    :acquired, :atomic, :is_part_of_atomic, :is_part_of_acquired
 
   belongs_to :project, :creator => :true
   belongs_to :root, :class_name => 'System'
@@ -40,6 +40,22 @@ class System < ActiveRecord::Base
   children :children,  :related_systems, :mech_systems
 
 
+  def is_part_of_acquired
+    if self.parent then
+      self.acquired || self.parent.is_part_of_acquired
+    else
+      self.acquired
+    end
+  end
+
+  def is_part_of_atomic
+    if self.parent then
+      self.atomic || self.parent.is_part_of_atomic
+    else
+      self.atomic
+    end
+  end
+  
   def full_name
     ret=abbrev
     p=self
@@ -404,10 +420,22 @@ class System < ActiveRecord::Base
       else
         img_path="/images/nodes/mech.png"
       end
+      if (self.is_part_of_atomic) then
+        img_path_atom="/images/nodes/atom.png"
+      else
+        img_path_atom=""
+      end
+      if (self.is_part_of_acquired) then
+        img_path_done="/images/nodes/done.png"
+      else
+        img_path_done=""
+      end
       doc.folder title:""+self.name,
         type:"systems",
         code:""+self.id.to_s,
         img:img_path,
+        img_atom:img_path_atom,
+        img_done:img_path_done,
         action:""+self.id.to_s do
 =begin
       self.state_machines.each {|sm|

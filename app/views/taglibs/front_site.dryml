@@ -84,7 +84,7 @@
                         <extend tag="show-page" for="System">
                             <old-show-page merge>
 
-                                <field-list: fields="abbrev, system_type, parent, root, project, layer, full_name" param/>
+                                <field-list: fields="abbrev, system_type, parent, root, project, layer, full_name, is_part_of_atomic, is_part_of_acquired" param/>
 
                                 <append-collection-section:>
                                         <a:project.systems action="new" if="&can_create?(@system.project.systems)" param="new-link" params="&{:super_system =>@system.id}">
