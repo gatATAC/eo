@@ -219,6 +219,13 @@
                             </page>
                         </def>
 
+<extend tag="show-page" for="ProjectRm">
+    <old-show-page merge>
+        <append-content:>
+                <%= link_to("Sync Issues", [@project_rm, :action => :sync_issues , :only_path => :true], :method => :post) %>
+        </append-content:>
+    </old-show-page>
+</extend>
 <extend tag="show-page" for="Project">
     <old-show-page merge>
         <append-content:>
