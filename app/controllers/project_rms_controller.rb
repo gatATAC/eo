@@ -16,7 +16,7 @@ class ProjectRmsController < ApplicationController
   def sync_issues
     @project_rm = find_instance
     @project_rm.sync_issues
-    redirect_to this
+    #redirect_to this
   end
 
 end

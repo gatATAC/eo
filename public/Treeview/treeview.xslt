@@ -101,6 +101,9 @@
                                 <img src="{$param-img-directory}plus.gif" />
                             </xsl:if>
                         </xsl:if>
+                        <xsl:if test="@priority">
+                            |<xsl:value-of select="@priority"/>|
+                        </xsl:if>
                         <xsl:if test="not(@virtual='true')">
                             <img src="{@img}">
                                 <!-- if the attribut alt is present-->
@@ -238,6 +241,9 @@
                                 <img src="{$param-img-directory}link.gif" />
                             </xsl:otherwise>
                         </xsl:choose>
+                        <xsl:if test="@priority">
+                            |<xsl:value-of select="@priority"/>|
+                        </xsl:if>
                         <xsl:if test="@virtual='true'">
                             <i>
                                 <small>

@@ -7,11 +7,12 @@ class System < ActiveRecord::Base
     abbrev :string
     atomic   :boolean
     acquired :boolean
+    acq_priority :integer, :default => 100
     virtual :boolean, :default => false
     timestamps
   end
   attr_accessible :name, :parent, :root, :parent_id, :root_id, :layer, :layer_id, :abbrev, :project, :project_id, :system_type_id, :system_type, :xcos_box, :xcos_box_id,
-    :acquired, :atomic, :is_part_of_atomic, :is_part_of_acquired, :virtual, :is_part_of_virtual
+    :acquired, :atomic, :is_part_of_atomic, :is_part_of_acquired, :virtual, :is_part_of_virtual, :acq_priority, :hierarchical_priority
 
   belongs_to :project, :creator => :true
   belongs_to :root, :class_name => 'System'
@@ -40,6 +41,13 @@ class System < ActiveRecord::Base
 
   children :children,  :related_systems, :mech_systems
 
+  def hierarchical_priority
+    if (self.parent) then
+      [self.acq_priority, self.parent.hierarchical_priority].min
+    else
+      self.acq_priority
+    end
+  end 
 
   def is_part_of_acquired
     if self.parent then
@@ -559,6 +567,7 @@ class System < ActiveRecord::Base
             img_done:img_path_done,
             virtual:virtstr,
             expanded:true,
+            priority:self.hierarchical_priority,
             action:""+self.id.to_s do
 =begin
       self.state_machines.each {|sm|
@@ -588,6 +597,7 @@ class System < ActiveRecord::Base
             img_atom:img_path_atom,
             img_done:img_path_done,
             virtual:virtstr,
+            priority:self.hierarchical_priority,
             action:""+self.id.to_s do
           end
         end
