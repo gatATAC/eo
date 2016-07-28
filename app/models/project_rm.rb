@@ -5,7 +5,7 @@ class ProjectRm < ActiveRecord::Base
 
   fields do
     rm_url        :string
-    rm_project    :integer
+    rm_project    :string
     rm_apikey     :string
     timestamps
   end
@@ -16,63 +16,33 @@ class ProjectRm < ActiveRecord::Base
   attr_accessible :rm_url, :rm_project, :rm_apikey, :project, :project_id
   
   children :issue_rms
-    
-  def reload_issues
-    RedmineRest::Models.configure_models apikey:self.rm_apikey, site:self.rm_url
 
-=begin destruye rm y/o incidencias asociadas
-    self.issue_rms.each{|rm|
-#=begin destruye incidencia del rm
-      i=Issue.find_by_id(rm.rm_ident)
-      if (i) then
-        i.destroy
-      end
-#=end destruye incidencia del rm
-      #=begin destruye rm
-      rm.destroy
-      #=end destruye rm
-    }
-=end destruye rm y/o incidencias asociadas
-    
-
-=begin destruye todas las incidencias
-    print("Empiezo a destruir incidencias\n")
-    iss = nil
-    while (iss == nil or iss.size > 0) do
-      if (iss != nil) then
-        print ("\nEmpiezo a destruir "+iss.size.to_s+" incidencias\n")
-        iss.each{|i|
-          i.destroy
-          print("\n2: Destruyo incidencia "+i.id.to_s)
-        }
-      end
-      iss=[]
-      all_issues=Issue.all.group_by_project
-      all_issues.each{|p,issues|
-        if (p.id==self.rm_project.to_s) then
-          iss=issues
-        end
-      }
-    end
-    print("Acabe de destruir incidencias\n")
-=end destruye todas las incidencias
-    
-    project_identifier="eotest"
-    this_project_id=0
+  def find_rm_project
+    pr=nil
+    prid=0
     all_projects=RedmineRest::Models::Project.all
     all_projects.each {|t|
-      if t.identifier == project_identifier then
-        this_project_id=t.id
+      if t.identifier == self.rm_project then
+        pr=t
+        prid=t.id
         break
       end
-    }    
-    
+    }
+    return pr,prid    
+  end
+  
+  
+  
+  def reload_issues
+    RedmineRest::Models.configure_models apikey:self.rm_apikey, site:self.rm_url
+  
+    pr,prid = self.find_rm_project
     pending_issues=true
     pending_offset=0
     extra = []
     extra += self.issue_rms
     while (pending_issues) do
-      issues=Issue.where(project_id:this_project_id, offset:pending_offset, order:('id desc'))
+      issues=Issue.where(project_id:prid, offset:pending_offset, order:('id desc'))
       if (issues != nil) then
         print("\n\n\n\n\n\n\n\n\ntengo issues = "+issues.size.to_s)
         pending_offset+=issues.size
@@ -131,61 +101,34 @@ class ProjectRm < ActiveRecord::Base
     }
   end  
 
+  def destroy_rm_issues(destroy_redmine, destroy_local)
+    self.issue_rms.each{|rm|
+      if (destroy_redmine) then
+        i=Issue.find_by_id(rm.rm_ident)
+        if (i) then
+          i.destroy
+        end
+      end
+      if (destroy_local) then
+        rm.destroy
+      end
+    }
+  end
+  
+  def destroy_all_issues
+    self.destroy_rm_issues(true,true)
+  end
+  
   def sync_issues
     RedmineRest::Models.configure_models apikey:self.rm_apikey, site:self.rm_url
     precedents = {:eng => nil, :delin => nil,
       :manuf => nil, :metro => nil, :valid => nil }
-
-=begin destruye rm y/o incidencias asociadas
-    self.issue_rms.each{|rm|
-#=begin destruye incidencia del rm
-      i=Issue.find_by_id(rm.rm_ident)
-      if (i) then
-        i.destroy
-      end
-#=end destruye incidencia del rm
-#=begin destruye rm
-      rm.destroy
-#=end destruye rm
-    }
-=end destruye rm y/o incidencias asociadas
     
-
-=begin destruye todas las incidencias
-    print("Empiezo a destruir incidencias\n")
-    iss = nil
-    while (iss == nil or iss.size > 0) do
-      if (iss != nil) then
-        print ("\nEmpiezo a destruir "+iss.size.to_s+" incidencias\n")
-        iss.each{|i|
-          i.destroy
-          print("\n2: Destruyo incidencia "+i.id.to_s)
-        }
-      end
-      iss=[]
-      all_issues=Issue.all.group_by_project
-      all_issues.each{|p,issues|
-        if (p.id==self.rm_project.to_s) then
-          iss=issues
-        end
-      }
-    end
-    print("Acabe de destruir incidencias\n")
-=end destruye todas las incidencias
-    
-    #=begin crea
-    all_projects=RedmineRest::Models::Project.all
-    pr=nil
-    all_projects.each {|t|
-      print "Project #{t.name} item:"+t.id.to_s+"\n"
-      if t.id.to_i == self.rm_project then
-        pr=t
-        print ("***** ESTE\n")
-      end
-    }
+    pr,prid=self.find_rm_project
     existing_issues=self.issue_rms.clone
     systosync = []
-    self.project.systems.each{|sys|
+    sortedsystems=self.project.systems.sort{|a,b| a.hierarchical_priority <=> b.hierarchical_priority}
+    sortedsystems.each{|sys|
       parentatomic=false
       if (sys.parent) then
         parentatomic=sys.parent.is_part_of_atomic
@@ -195,10 +138,9 @@ class ProjectRm < ActiveRecord::Base
       end
     }
     #systosync.order(:hierarchical_priority).all[0..10].each{|sys|
-    systosync[0..10].each{|sys|
-      prec=sync_issue(pr,sys,existing_issues,precedents)
+    systosync.each{|sys|
+      prec=self.sync_issue(pr,sys,existing_issues,precedents)
     }
-    #=end crea
   end
     
   def create_issue(pr,ms,prec)

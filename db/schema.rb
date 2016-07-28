@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160726191034) do
+ActiveRecord::Schema.define(version: 20160727180902) do
 
   create_table "acquisition_statuses", force: :cascade do |t|
     t.string   "name"
@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(version: 20160726191034) do
 
   create_table "project_rms", force: :cascade do |t|
     t.string   "rm_url"
-    t.integer  "rm_project"
+    t.string   "rm_project"
     t.string   "rm_apikey"
     t.datetime "created_at"
     t.datetime "updated_at"

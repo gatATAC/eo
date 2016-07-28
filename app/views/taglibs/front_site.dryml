@@ -221,9 +221,12 @@
 
 <extend tag="show-page" for="ProjectRm">
     <old-show-page merge>
-        <append-content:>
-                <%= link_to("Sync Issues", [@project_rm, :action => :sync_issues , :only_path => :true], :method => :post) %>
-        </append-content:>
+        <prepend-collection-section:>
+            <ul>
+                <li><%= link_to("Sync Issues", [@project_rm, :action => :sync_issues , :only_path => :true], :method => :post) %></li>
+                <li><%= link_to("Destroy all project Issues", [@project_rm, :action => :destroy_issues , :only_path => :true], :method => :post) %></li>
+            </ul>
+        </prepend-collection-section:>
     </old-show-page>
 </extend>
 <extend tag="show-page" for="Project">
