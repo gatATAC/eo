@@ -28,6 +28,18 @@ class IssueRm < ActiveRecord::Base
     project_rm.rm_url+"/issues/"+rm_ident.to_s
   end
   
+  def acquisition_status
+    ret=nil
+    sys=self.system
+    if (sys) then
+      ms=sys.mech_systems.first
+      if (ms) then
+        ret=ms.acquisition_status
+      end
+    end
+    return ret
+  end
+  
   # --- Permissions --- #
 
   def create_permitted?
