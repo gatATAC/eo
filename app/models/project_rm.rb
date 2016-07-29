@@ -147,15 +147,50 @@ class ProjectRm < ActiveRecord::Base
     @patch_already_designed = true
     @id_custom_field_eosys = 1
     @id_custom_field_eosysid = 2
+    @patch_dont_create_subcontract = true
     if (ms.acquisition_workflow) then
       all_trackers=RedmineRest::Models::Tracker.all
-      tr=nil
+      workfltr=nil
+      manuftr=nil
+      delintr=nil
+      metrotr=nil
+      doctr=nil
+      designtr=nil
+      validtr=nil
+      supervtr=nil
       all_trackers.each {|t|
         print "Tracker #{t.name} item:"+t.id.to_s+"\n"
         if t.name==ms.acquisition_workflow.name then
-          tr=t
-          print ("***** ESTE\n")
+          workfltr = t
         end
+        if t.name=="Manufacture" then
+          manuftr=t
+        else
+          if t.name=="Delineation" then
+            delintr=t
+          else
+            if t.name=="Measure" then
+              metrotr=t
+            else
+              if t.name=="Document" then
+                doctr=t
+              else
+                if t.name=="Design" then
+                  designtr=t
+                else
+                  if t.name=="Validate" then
+                    validtr=t
+                  else
+                    if t.name=="Supervision" then
+                      supervtr = t
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        
       }
 
       all_users=RedmineRest::Models::User.all
@@ -179,468 +214,469 @@ class ProjectRm < ActiveRecord::Base
       }
 =end
       current_date=Time.now
-      print "Creamos una issue\n"
-      i=Issue.new
-      i.project=pr
-      i.tracker=tr
-      i.subject=tr.name+" of "+ms.to_s
-      i.author_id=us
-      i.status_id=1
-      i.priority_id=1
-      i.description="Issue to track " + tr.name+" of "+ms.to_s
-      i.custom_fields = []
-      i.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-      i.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-      print i.custom_fields.to_s
-      done=i.save
-      print "Hecho: "+done.to_s+"\n"
-      print "Issue:"+i.to_s+"\n"
-      print "Tracker:"+i.tracker.id.to_s+"\n"
-      print "Project:"+i.project.id.to_s+"\n"
       
-      # Creamos las sub issues
-      if (ms.acquisition_workflow.name=="Fabrication") then
-        if (ms.acquisition_status.name!="Validation") then
-          if (ms.acquisition_status.name!="Manufactured") then
-            if (ms.acquisition_status.name!="Manufacturing") then
-              if (not(@patch_already_designed)) then
-                # Create the spec
-                iSpec=Issue.new
-                if (prec[:eng]==nil) then
-                  iSpec.start_date = current_date
-                  iSpec.due_date = iSpec.start_date
-                end
-                iSpec.project=pr
-                iSpec.tracker=tr
-                iSpec.parent=i
-                iSpec.subject="Specification"+" of "+ms.to_s
-                iSpec.author_id=us
-                iSpec.status_id=1
-                iSpec.priority_id=1
-                iSpec.description="Issue to track " + "specification" + " of "+ms.to_s
-                iSpec.custom_fields = []
-                iSpec.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                iSpec.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-                iSpec.estimated_hours=8
-                print iSpec.custom_fields.to_s
-                done=iSpec.save
-                print "Hecho: "+done.to_s+"\n"
-                print "Issue:"+iSpec.to_s+"\n"
-                print "Tracker:"+iSpec.tracker.id.to_s+"\n"
-                print "Project:"+iSpec.project.id.to_s+"\n"        
-                if (prec[:eng]) then
-                  r1=Relation.new
-                  r1.prefix_options[:issue_id] = prec[:eng].id
-                  r1.issue_id=prec[:eng].id
-                  r1.issue_to_id=iSpec.id
-                  r1.relation_type="precedes"
-                  done=r1.save
-                  print "Relation Hecho: "+done.to_s+"\n"        
-                end
+      if (@patch_dont_create_subcontract == false || workfltr.name!="Subcontract") 
+        i=Issue.new
+        i.project=pr
+        i.tracker=workfltr
+        i.subject=ms.to_s
+        i.author_id=us
+        i.status_id=1
+        i.priority_id=1
+        i.description="Issue to track " + workfltr.name+" of "+ms.to_s
+        i.custom_fields = []
+        i.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+        i.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+        print i.custom_fields.to_s
+        done=i.save
+        print "Hecho: "+done.to_s+"\n"
+        print "Issue:"+i.to_s+"\n"
+        print "Tracker:"+i.tracker.id.to_s+"\n"
+        print "Project:"+i.project.id.to_s+"\n"
+      
+        # Creamos las sub issues
+        if (ms.acquisition_workflow.name=="Fabrication") then
+          if (ms.acquisition_status.name!="Validation") then
+            if (ms.acquisition_status.name!="Manufactured") then
+              if (ms.acquisition_status.name!="Manufacturing") then
+                if (not(@patch_already_designed)) then
+                  # Create the spec
+                  iSpec=Issue.new
+                  if (prec[:eng]==nil) then
+                    iSpec.start_date = current_date
+                    iSpec.due_date = iSpec.start_date
+                  end
+                  iSpec.project=pr
+                  iSpec.tracker = doctr
+                  iSpec.parent=i
+                  iSpec.subject="Spec " + ms.to_s
+                  iSpec.author_id=us
+                  iSpec.status_id=1
+                  iSpec.priority_id=1
+                  iSpec.description="Issue to track " + "specification" + " of "+ms.to_s
+                  iSpec.custom_fields = []
+                  iSpec.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+                  iSpec.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                  iSpec.estimated_hours=8
+                  print iSpec.custom_fields.to_s
+                  done=iSpec.save
+                  print "Hecho: "+done.to_s+"\n"
+                  print "Issue:"+iSpec.to_s+"\n"
+                  print "Tracker:"+iSpec.tracker.id.to_s+"\n"
+                  print "Project:"+iSpec.project.id.to_s+"\n"        
+                  if (prec[:eng]) then
+                    r1=Relation.new
+                    r1.prefix_options[:issue_id] = prec[:eng].id
+                    r1.issue_id=prec[:eng].id
+                    r1.issue_to_id=iSpec.id
+                    r1.relation_type="precedes"
+                    done=r1.save
+                    print "Relation Hecho: "+done.to_s+"\n"        
+                  end
 
-                # Create the validation plan
-                iValP=Issue.new
-                iValP.start_date = iSpec.start_date
-                iValP.due_date = iSpec.due_date
-                iValP.project=pr
-                iValP.tracker=tr
-                iValP.parent=i
-                #i3.blocked_by << i2
-                iValP.subject="Validation Plan"+" of "+ms.to_s
-                iValP.author_id=us
-                iValP.status_id=1
-                iValP.priority_id=1
-                iValP.description="Issue to track " + "validation plan" + " of "+ms.to_s
-                iValP.custom_fields = []
-                iValP.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                iValP.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-                iValP.estimated_hours=8
-                print iValP.custom_fields.to_s
-                done=iValP.save
+                  # Create the validation plan
+                  iValP=Issue.new
+                  iValP.start_date = iSpec.start_date
+                  iValP.due_date = iSpec.due_date
+                  iValP.project=pr
+                  iValP.tracker=doctr
+                  iValP.parent=i
+                  #i3.blocked_by << i2
+                  iValP.subject="VPlan "+ms.to_s
+                  iValP.author_id=us
+                  iValP.status_id=1
+                  iValP.priority_id=1
+                  iValP.description="Issue to track " + "validation plan" + " of "+ms.to_s
+                  iValP.custom_fields = []
+                  iValP.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+                  iValP.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                  iValP.estimated_hours=8
+                  print iValP.custom_fields.to_s
+                  done=iValP.save
+                  print "Hecho: "+done.to_s+"\n"
+                  print "Issue:"+iValP.to_s+"\n"
+                  print "Tracker:"+iValP.tracker.id.to_s+"\n"
+                  print "Project:"+iValP.project.id.to_s+"\n"        
+                  if (prec[:eng]) then
+                    r1=Relation.new
+                    r1.prefix_options[:issue_id] = prec[:eng].id
+                    r1.issue_id=prec[:eng].id
+                    r1.issue_to_id=iValP.id
+                    r1.relation_type="precedes"
+                    done=r1.save
+                    print "Relation Hecho: "+done.to_s+"\n"        
+                  end
+                  if (iSpec) then
+                    r1=Relation.new
+                    r1.prefix_options[:issue_id] = iValP.id
+                    r1.issue_id=iValP.id
+                    r1.issue_to_id=iSpec.id
+                    r1.relation_type="blocks"
+                    done=r1.save
+                    print "Relation Hecho: "+done.to_s+"\n"        
+                  end
+                  # Create the Design
+                  iDesign=Issue.new
+                  iDesign.project=pr
+                  iDesign.tracker=designtr
+                  iDesign.parent=i
+                  iDesign.subject=ms.to_s
+                  iDesign.author_id=us
+                  iDesign.status_id=1
+                  iDesign.priority_id=1
+                  iDesign.description="Issue to track " + "design" + " of "+ms.to_s
+                  iDesign.custom_fields = []
+                  iDesign.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+                  iDesign.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                  iDesign.estimated_hours=8
+                  print iDesign.custom_fields.to_s
+                  done=iDesign.save
+                  print "Hecho: "+done.to_s+"\n"
+                  print "Issue:"+iDesign.to_s+"\n"
+                  print "Tracker:"+iDesign.tracker.id.to_s+"\n"
+                  print "Project:"+iDesign.project.id.to_s+"\n"
+                  if (iSpec) then
+                    r2=Relation.new
+                    r2.prefix_options[:issue_id] = iSpec.id
+                    r2.issue_id=iSpec.id
+                    r2.issue_to_id=iDesign.id
+                    r2.relation_type="precedes"
+                    r2.delay=0
+                    done=r2.save
+                    print "Relation Hecho: "+done.to_s+"\n"
+                  end
+                  prec[:eng]=iDesign
+                else
+                end
+                # Create the Delineation
+                iDelin=Issue.new
+                iDelin.project=pr
+                iDelin.tracker=delintr
+                if (@patch_already_designed) then
+                  if (prec[:delin] == nil) then
+                    iDelin.start_date = current_date
+                    iDelin.due_date = iDelin.start_date
+                  end
+                end
+                iDelin.parent=i
+                iDelin.subject=ms.to_s
+                iDelin.author_id=us
+                iDelin.status_id=1
+                iDelin.priority_id=1
+                iDelin.description="Issue to track " + "delineation" + " of "+ms.to_s
+                iDelin.custom_fields = []
+                iDelin.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+                iDelin.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                iDelin.estimated_hours=8
+                print iDelin.custom_fields.to_s
+                done=iDelin.save
                 print "Hecho: "+done.to_s+"\n"
-                print "Issue:"+iValP.to_s+"\n"
-                print "Tracker:"+iValP.tracker.id.to_s+"\n"
-                print "Project:"+iValP.project.id.to_s+"\n"        
-                if (prec[:eng]) then
+                print "Issue:"+iDelin.to_s+"\n"
+                print "Tracker:"+iDelin.tracker.id.to_s+"\n"
+                print "Project:"+iDelin.project.id.to_s+"\n"
+                if (prec[:delin]) then
                   r1=Relation.new
-                  r1.prefix_options[:issue_id] = prec[:eng].id
-                  r1.issue_id=prec[:eng].id
-                  r1.issue_to_id=iValP.id
+                  r1.prefix_options[:issue_id] = prec[:delin].id
+                  r1.issue_id=prec[:delin].id
+                  r1.issue_to_id=iDelin.id
                   r1.relation_type="precedes"
                   done=r1.save
                   print "Relation Hecho: "+done.to_s+"\n"        
                 end
-                if (iSpec) then
+                if (not(@patch_already_designed)) then
+                  precissue = iDesign
+                else
+                  precissue = prec[:delin]
+                end
+                if (precissue) then
+                  r3=Relation.new
+                  r3.prefix_options[:issue_id] = precissue.id
+                  r3.issue_id = precissue.id
+                  r3.issue_to_id = iDelin.id
+                  r3.relation_type="precedes"
+                  r3.delay=0
+                  done=r3.save
+                  print "Relation Hecho: "+done.to_s+"\n"
+                end  
+
+                # Supervise the delineation
+                iDelinSup=Issue.new
+                iDelinSup.project = pr
+                iDelinSup.tracker = supervtr
+                if (@patch_already_designed) then
+                  if (prec[:delin] == nil) then
+                    iDelinSup.start_date = iDelin.start_date
+                    iDelinSup.due_date = iDelin.start_date
+                  end
+                end
+                iDelinSup.parent=i
+                iDelinSup.subject="Sv Delin "+ms.to_s
+                iDelinSup.author_id=us
+                iDelinSup.status_id=1
+                iDelinSup.priority_id=1
+                iDelinSup.description="Issue to track " + "delineation supervision" + " of "+ms.to_s
+                iDelinSup.custom_fields = []
+                iDelinSup.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+                iDelinSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                iDelinSup.estimated_hours=8
+                print iDelinSup.custom_fields.to_s
+                done=iDelinSup.save
+                print "Hecho: "+done.to_s+"\n"
+                print "Issue:"+iDelinSup.to_s+"\n"
+                print "Tracker:"+iDelinSup.tracker.id.to_s+"\n"
+                print "Project:"+iDelinSup.project.id.to_s+"\n"
+                if (prec[:delin]) then
                   r1=Relation.new
-                  r1.prefix_options[:issue_id] = iValP.id
-                  r1.issue_id=iValP.id
-                  r1.issue_to_id=iSpec.id
-                  r1.relation_type="blocks"
+                  r1.prefix_options[:issue_id] = prec[:delin].id
+                  r1.issue_id=prec[:delin].id
+                  r1.issue_to_id=iDelinSup.id
+                  r1.relation_type="precedes"
                   done=r1.save
                   print "Relation Hecho: "+done.to_s+"\n"        
                 end
-                # Create the Design
-                iDesign=Issue.new
-                iDesign.project=pr
-                iDesign.tracker=tr
-                iDesign.parent=i
-                iDesign.subject="Design"+" of "+ms.to_s
-                iDesign.author_id=us
-                iDesign.status_id=1
-                iDesign.priority_id=1
-                iDesign.description="Issue to track " + "design" + " of "+ms.to_s
-                iDesign.custom_fields = []
-                iDesign.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                iDesign.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-                iDesign.estimated_hours=8
-                print iDesign.custom_fields.to_s
-                done=iDesign.save
-                print "Hecho: "+done.to_s+"\n"
-                print "Issue:"+iDesign.to_s+"\n"
-                print "Tracker:"+iDesign.tracker.id.to_s+"\n"
-                print "Project:"+iDesign.project.id.to_s+"\n"
-                if (iSpec) then
-                  r2=Relation.new
-                  r2.prefix_options[:issue_id] = iSpec.id
-                  r2.issue_id=iSpec.id
-                  r2.issue_to_id=iDesign.id
-                  r2.relation_type="precedes"
-                  r2.delay=0
-                  done=r2.save
+                if (not(@patch_already_designed)) then
+                  precissue = iDesign
+                else
+                  precissue = prec[:delin]
+                end
+                if (precissue) then
+                  r4=Relation.new
+                  r4.prefix_options[:issue_id] = precissue.id
+                  r4.issue_id = precissue.id
+                  r4.issue_to_id = iDelinSup.id
+                  r4.relation_type="precedes"
+                  r4.delay=0
+                  done=r4.save
                   print "Relation Hecho: "+done.to_s+"\n"
                 end
-                prec[:eng]=iDesign
-              else
-              end
-              # Create the Delineation
-              iDelin=Issue.new
-              iDelin.project=pr
-              iDelin.tracker=tr
-              if (@patch_already_designed) then
-                if (prec[:delin] == nil) then
-                  iDelin.start_date = current_date
-                  iDelin.due_date = iDelin.start_date
+                if (iDelin) then
+                  r5=Relation.new
+                  r5.prefix_options[:issue_id] = iDelinSup.id
+                  r5.issue_id=iDelinSup.id
+                  r5.issue_to_id=iDelin.id
+                  r5.relation_type="blocks"
+                  done=r5.save
+                  print "Relation Hecho: "+done.to_s+"\n"
                 end
-              end
-              iDelin.parent=i
-              iDelin.subject="Delineation"+" of "+ms.to_s
-              iDelin.author_id=us
-              iDelin.status_id=1
-              iDelin.priority_id=1
-              iDelin.description="Issue to track " + "delineation" + " of "+ms.to_s
-              iDelin.custom_fields = []
-              iDelin.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-              iDelin.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-              iDelin.estimated_hours=8
-              print iDelin.custom_fields.to_s
-              done=iDelin.save
-              print "Hecho: "+done.to_s+"\n"
-              print "Issue:"+iDelin.to_s+"\n"
-              print "Tracker:"+iDelin.tracker.id.to_s+"\n"
-              print "Project:"+iDelin.project.id.to_s+"\n"
-              if (prec[:delin]) then
-                r1=Relation.new
-                r1.prefix_options[:issue_id] = prec[:delin].id
-                r1.issue_id=prec[:delin].id
-                r1.issue_to_id=iDelin.id
-                r1.relation_type="precedes"
-                done=r1.save
-                print "Relation Hecho: "+done.to_s+"\n"        
-              end
-              if (not(@patch_already_designed)) then
-                precissue = iDesign
-              else
-                precissue = prec[:delin]
-              end
-              if (precissue) then
-                r3=Relation.new
-                r3.prefix_options[:issue_id] = precissue.id
-                r3.issue_id = precissue.id
-                r3.issue_to_id = iDelin.id
-                r3.relation_type="precedes"
-                r3.delay=0
-                done=r3.save
-                print "Relation Hecho: "+done.to_s+"\n"
-              end  
 
-              # Supervise the delineation
-              iDelinSup=Issue.new
-              iDelinSup.project=pr
-              iDelinSup.tracker=tr
-              if (@patch_already_designed) then
-                if (prec[:delin] == nil) then
-                  iDelinSup.start_date = iDelin.start_date
-                  iDelinSup.due_date = iDelin.start_date
-                end
+                prec[:delin]=iDelin
               end
-              iDelinSup.parent=i
-              iDelinSup.subject="Supervision of Delineation"+" of "+ms.to_s
-              iDelinSup.author_id=us
-              iDelinSup.status_id=1
-              iDelinSup.priority_id=1
-              iDelinSup.description="Issue to track " + "delineation supervision" + " of "+ms.to_s
-              iDelinSup.custom_fields = []
-              iDelinSup.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-              iDelinSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-              iDelinSup.estimated_hours=8
-              print iDelinSup.custom_fields.to_s
-              done=iDelinSup.save
-              print "Hecho: "+done.to_s+"\n"
-              print "Issue:"+iDelinSup.to_s+"\n"
-              print "Tracker:"+iDelinSup.tracker.id.to_s+"\n"
-              print "Project:"+iDelinSup.project.id.to_s+"\n"
-              if (prec[:delin]) then
-                r1=Relation.new
-                r1.prefix_options[:issue_id] = prec[:delin].id
-                r1.issue_id=prec[:delin].id
-                r1.issue_to_id=iDelinSup.id
-                r1.relation_type="precedes"
-                done=r1.save
-                print "Relation Hecho: "+done.to_s+"\n"        
-              end
-              if (not(@patch_already_designed)) then
-                precissue = iDesign
-              else
-                precissue = prec[:delin]
-              end
-              if (precissue) then
-                r4=Relation.new
-                r4.prefix_options[:issue_id] = precissue.id
-                r4.issue_id = precissue.id
-                r4.issue_to_id = iDelinSup.id
-                r4.relation_type="precedes"
-                r4.delay=0
-                done=r4.save
-                print "Relation Hecho: "+done.to_s+"\n"
-              end
-              if (iDelin) then
-                r5=Relation.new
-                r5.prefix_options[:issue_id] = iDelinSup.id
-                r5.issue_id=iDelinSup.id
-                r5.issue_to_id=iDelin.id
-                r5.relation_type="blocks"
-                done=r5.save
-                print "Relation Hecho: "+done.to_s+"\n"
-              end
-
-              prec[:delin]=iDelin
             end
-          end
-          # Manufacture it
-          iManuf=Issue.new
-          iManuf.project=pr
-          iManuf.tracker=tr
-          if (iDelin == nil and prec[:manuf] == nil) then
-            iManuf.start_date = current_date
-            iManuf.due_date = iManuf.start_date
-          end
-          iManuf.parent=i
-          iManuf.subject="Manufacturing"+" of "+ms.to_s
-          iManuf.status_id=1
-          iManuf.priority_id=1
-          iManuf.description="Issue to track " + "manufacturing" + " of "+ms.to_s
-          iManuf.custom_fields = []
-          iManuf.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-          iManuf.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-          iManuf.estimated_hours=8
-          print iManuf.custom_fields.to_s
-          done=iManuf.save
-          if (ms.acquisition_status.name=="Manufactured") then
-            iManuf.status_id=3
-            iManuf.done_ratio=100
-            iManuf.subject="/Manufacturing"+" of "+ms.to_s
-          end
-          done=iManuf.save
-          print "Hecho: "+done.to_s+"\n"
-          print "Issue:"+iManuf.to_s+"\n"
-          print "Tracker:"+iManuf.tracker.id.to_s+"\n"
-          print "Project:"+iManuf.project.id.to_s+"\n"
-          if (prec[:manuf]) then
-            r1=Relation.new
-            r1.prefix_options[:issue_id] = prec[:manuf].id
-            r1.issue_id=prec[:manuf].id
-            r1.issue_to_id=iManuf.id
-            r1.relation_type="precedes"
-            done=r1.save
-            print "Relation Hecho: "+done.to_s+"\n"        
-          end
-          if (iDelin) then
-            r3=Relation.new
-            r3.prefix_options[:issue_id] = iDelin.id
-            r3.issue_id=iDelin.id
-            r3.issue_to_id=iManuf.id
-            r3.relation_type="precedes"
-            r3.delay=0
-            done=r3.save
-            print "Relation Hecho: "+done.to_s+"\n"
-          end
-          # Supervise the manufacturing
-          iManufSup=Issue.new
-          iManufSup.project=pr
-          iManufSup.tracker=tr
-          if (iDelin == nil and prec[:manuf] == nil) then
+            # Manufacture it
+            iManuf=Issue.new
+            iManuf.project=pr
+            iManuf.tracker=manuftr
+            if (iDelin == nil and prec[:manuf] == nil) then
+              iManuf.start_date = current_date
+              iManuf.due_date = iManuf.start_date
+            end
+            iManuf.parent=i
+            iManuf.subject=ms.to_s
+            iManuf.status_id=1
+            iManuf.priority_id=1
+            iManuf.description="Issue to track " + "manufacturing" + " of "+ms.to_s
+            iManuf.custom_fields = []
+            iManuf.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+            iManuf.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+            iManuf.estimated_hours=8
+            print iManuf.custom_fields.to_s
+            done=iManuf.save
+            if (ms.acquisition_status.name=="Manufactured") then
+              iManuf.status_id=3
+              iManuf.done_ratio=100
+            end
+            done=iManuf.save
+            print "Hecho: "+done.to_s+"\n"
+            print "Issue:"+iManuf.to_s+"\n"
+            print "Tracker:"+iManuf.tracker.id.to_s+"\n"
+            print "Project:"+iManuf.project.id.to_s+"\n"
+            if (prec[:manuf]) then
+              r1=Relation.new
+              r1.prefix_options[:issue_id] = prec[:manuf].id
+              r1.issue_id=prec[:manuf].id
+              r1.issue_to_id=iManuf.id
+              r1.relation_type="precedes"
+              done=r1.save
+              print "Relation Hecho: "+done.to_s+"\n"        
+            end
+            if (iDelin) then
+              r3=Relation.new
+              r3.prefix_options[:issue_id] = iDelin.id
+              r3.issue_id=iDelin.id
+              r3.issue_to_id=iManuf.id
+              r3.relation_type="precedes"
+              r3.delay=0
+              done=r3.save
+              print "Relation Hecho: "+done.to_s+"\n"
+            end
+            # Supervise the manufacturing
+            iManufSup=Issue.new
+            iManufSup.project = pr
+            iManufSup.tracker = supervtr
+            if (iDelin == nil and prec[:manuf] == nil) then
+              if (iManuf) then
+                iManufSup.start_date = iManuf.start_date
+                iManufSup.due_date = iManufSup.due_date
+              else
+                iManufSup.start_date = current_date
+                iManufSup.due_date = iManufSup.start_date
+              end
+            end
+            iManufSup.parent=i
+            iManufSup.subject="Sv Manuf "+ms.to_s
+            iManufSup.author_id=us
+            iManufSup.status_id=1
+            iManufSup.priority_id=1
+            iManufSup.description="Issue to track " + "manufacturing supervision" + " of "+ms.to_s
+            iManufSup.custom_fields = []
+            iManufSup.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+            iManufSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+            iManufSup.estimated_hours=8
+            print iManufSup.custom_fields.to_s
+            done=iManufSup.save
+            print "Hecho: "+done.to_s+"\n"
+            print "Issue:"+iManufSup.to_s+"\n"
+            print "Tracker:"+iManufSup.tracker.id.to_s+"\n"
+            print "Project:"+iManufSup.project.id.to_s+"\n"
+            if (prec[:manuf]) then
+              r1=Relation.new
+              r1.prefix_options[:issue_id] = prec[:manuf].id
+              r1.issue_id=prec[:manuf].id
+              r1.issue_to_id=iManufSup.id
+              r1.relation_type="precedes"
+              done=r1.save
+              print "Relation Hecho: "+done.to_s+"\n"        
+            end
+            if (iDelin) then
+              r4=Relation.new
+              r4.prefix_options[:issue_id] = iDelin.id
+              r4.issue_id=iDelin.id
+              r4.issue_to_id=iManufSup.id
+              r4.relation_type="precedes"
+              r4.delay=0
+              done=r4.save
+              print "Relation Hecho: "+done.to_s+"\n"
+            end
             if (iManuf) then
-              iManufSup.start_date = iManuf.start_date
-              iManufSup.due_date = iManufSup.due_date
-            else
-              iManufSup.start_date = current_date
-              iManufSup.due_date = iManufSup.start_date
+              r5=Relation.new
+              r5.prefix_options[:issue_id] = iManufSup.id
+              r5.issue_id=iManufSup.id
+              r5.issue_to_id=iManuf.id
+              r5.relation_type="blocks"
+              done=r5.save
+              print "Relation Hecho: "+done.to_s+"\n"
             end
-          end
-          iManufSup.parent=i
-          iManufSup.subject="Supervision of Manufacturing"+" of "+ms.to_s
-          iManufSup.author_id=us
-          iManufSup.status_id=1
-          iManufSup.priority_id=1
-          iManufSup.description="Issue to track " + "manufacturing supervision" + " of "+ms.to_s
-          iManufSup.custom_fields = []
-          iManufSup.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-          iManufSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-          iManufSup.estimated_hours=8
-          print iManufSup.custom_fields.to_s
-          done=iManufSup.save
-          print "Hecho: "+done.to_s+"\n"
-          print "Issue:"+iManufSup.to_s+"\n"
-          print "Tracker:"+iManufSup.tracker.id.to_s+"\n"
-          print "Project:"+iManufSup.project.id.to_s+"\n"
-          if (prec[:manuf]) then
-            r1=Relation.new
-            r1.prefix_options[:issue_id] = prec[:manuf].id
-            r1.issue_id=prec[:manuf].id
-            r1.issue_to_id=iManufSup.id
-            r1.relation_type="precedes"
-            done=r1.save
-            print "Relation Hecho: "+done.to_s+"\n"        
-          end
-          if (iDelin) then
-            r4=Relation.new
-            r4.prefix_options[:issue_id] = iDelin.id
-            r4.issue_id=iDelin.id
-            r4.issue_to_id=iManufSup.id
-            r4.relation_type="precedes"
-            r4.delay=0
-            done=r4.save
-            print "Relation Hecho: "+done.to_s+"\n"
-          end
-          if (iManuf) then
-            r5=Relation.new
-            r5.prefix_options[:issue_id] = iManufSup.id
-            r5.issue_id=iManufSup.id
-            r5.issue_to_id=iManuf.id
-            r5.relation_type="blocks"
-            done=r5.save
-            print "Relation Hecho: "+done.to_s+"\n"
-          end
         
-          # Metrology
-          iMetro=Issue.new
-          iMetro.project=pr
-          iMetro.tracker=tr
-          iMetro.parent=i
-          iMetro.subject="Metrology"+" of "+ms.to_s
-          iMetro.author_id=us
-          iMetro.status_id=1
-          iMetro.priority_id=1
-          iMetro.description="Issue to track " + "metrology" + " of "+ms.to_s
-          iMetro.custom_fields = []
-          iMetro.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-          iMetro.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-          iMetro.estimated_hours=8
-          print iMetro.custom_fields.to_s
-          done=iMetro.save
+            # Metrology
+            iMetro=Issue.new
+            iMetro.project=pr
+            iMetro.tracker=metrotr
+            iMetro.parent=i
+            iMetro.subject=ms.to_s
+            iMetro.author_id=us
+            iMetro.status_id=1
+            iMetro.priority_id=1
+            iMetro.description="Issue to track " + "metrology" + " of "+ms.to_s
+            iMetro.custom_fields = []
+            iMetro.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+            iMetro.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+            iMetro.estimated_hours=8
+            print iMetro.custom_fields.to_s
+            done=iMetro.save
+            print "Hecho: "+done.to_s+"\n"
+            print "Issue:"+iMetro.to_s+"\n"
+            print "Tracker:"+iMetro.tracker.id.to_s+"\n"
+            print "Project:"+iMetro.project.id.to_s+"\n"
+            if (prec[:manuf]) then
+              r1=Relation.new
+              r1.prefix_options[:issue_id] = prec[:manuf].id
+              r1.issue_id=prec[:manuf].id
+              r1.issue_to_id=iMetro.id
+              r1.relation_type="precedes"
+              done=r1.save
+              print "Relation Hecho: "+done.to_s+"\n"        
+            end
+            if (prec[:metro]) then
+              r1=Relation.new
+              r1.prefix_options[:issue_id] = prec[:metro].id
+              r1.issue_id=prec[:metro].id
+              r1.issue_to_id=iMetro.id
+              r1.relation_type="precedes"
+              done=r1.save
+              print "Relation Hecho: "+done.to_s+"\n"        
+            end
+            if (iDelin) then
+              r4=Relation.new
+              r4.prefix_options[:issue_id] = iDelin.id
+              r4.issue_id=iDelin.id
+              r4.issue_to_id=iMetro.id
+              r4.relation_type="precedes"
+              r4.delay=0
+              done=r4.save
+              print "Relation Hecho: "+done.to_s+"\n"
+            end
+            if (iManufSup) then
+              r5=Relation.new
+              r5.prefix_options[:issue_id] = iManufSup.id
+              r5.issue_id=iManufSup.id
+              r5.issue_to_id=iMetro.id
+              r5.relation_type="blocks"
+              done=r5.save
+              print "Relation Hecho: "+done.to_s+"\n"
+            end
+            if (iManuf) then
+              r5=Relation.new
+              r5.prefix_options[:issue_id] = iMetro.id
+              r5.issue_id=iMetro.id
+              r5.issue_to_id=iManuf.id
+              r5.relation_type="blocks"
+              done=r5.save
+              print "Relation Hecho: "+done.to_s+"\n"
+            end
+            prec[:manuf]=iManuf
+            prec[:metro]=iMetro     
+          else
+          
+          end
+          # Validation
+          iVal=Issue.new
+          iVal.project=pr
+          iVal.tracker=validtr
+          if (iManuf == nil and prec[:eng] == nil) then
+            iVal.start_date = current_date
+            iVal.due_date = iVal.start_date
+          end
+          iVal.parent=i
+          iVal.subject=ms.to_s
+          iVal.author_id=us
+          iVal.status_id=1
+          iVal.priority_id=1
+          iVal.description="Issue to track " + "validation" + " of "+ms.to_s
+          iVal.custom_fields = []
+          iVal.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
+          iVal.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+          iVal.estimated_hours=8
+          print iVal.custom_fields.to_s
+          done=iVal.save
           print "Hecho: "+done.to_s+"\n"
-          print "Issue:"+iMetro.to_s+"\n"
-          print "Tracker:"+iMetro.tracker.id.to_s+"\n"
-          print "Project:"+iMetro.project.id.to_s+"\n"
-          if (prec[:manuf]) then
-            r1=Relation.new
-            r1.prefix_options[:issue_id] = prec[:manuf].id
-            r1.issue_id=prec[:manuf].id
-            r1.issue_to_id=iMetro.id
-            r1.relation_type="precedes"
-            done=r1.save
-            print "Relation Hecho: "+done.to_s+"\n"        
+          print "Issue:"+iVal.to_s+"\n"
+          print "Tracker:"+iVal.tracker.id.to_s+"\n"
+          print "Project:"+iVal.project.id.to_s+"\n"
+          if iManuf then
+            precissue=iManuf
+          else
+            precissue=prec[:eng]
           end
-          if (prec[:metro]) then
-            r1=Relation.new
-            r1.prefix_options[:issue_id] = prec[:metro].id
-            r1.issue_id=prec[:metro].id
-            r1.issue_to_id=iMetro.id
-            r1.relation_type="precedes"
-            done=r1.save
-            print "Relation Hecho: "+done.to_s+"\n"        
-          end
-          if (iDelin) then
+          if (precissue) then
             r4=Relation.new
-            r4.prefix_options[:issue_id] = iDelin.id
-            r4.issue_id=iDelin.id
-            r4.issue_to_id=iMetro.id
+            r4.prefix_options[:issue_id] = precissue.id
+            r4.issue_id=precissue.id
+            r4.issue_to_id=iVal.id
             r4.relation_type="precedes"
             r4.delay=0
             done=r4.save
             print "Relation Hecho: "+done.to_s+"\n"
           end
-          if (iManufSup) then
-            r5=Relation.new
-            r5.prefix_options[:issue_id] = iManufSup.id
-            r5.issue_id=iManufSup.id
-            r5.issue_to_id=iMetro.id
-            r5.relation_type="blocks"
-            done=r5.save
-            print "Relation Hecho: "+done.to_s+"\n"
-          end
-          if (iManuf) then
-            r5=Relation.new
-            r5.prefix_options[:issue_id] = iMetro.id
-            r5.issue_id=iMetro.id
-            r5.issue_to_id=iManuf.id
-            r5.relation_type="blocks"
-            done=r5.save
-            print "Relation Hecho: "+done.to_s+"\n"
-          end
-          prec[:manuf]=iManuf
-          prec[:metro]=iMetro     
-        else
-          
-        end
-        # Validation
-        iVal=Issue.new
-        iVal.project=pr
-        iVal.tracker=tr
-        if (iManuf == nil and prec[:eng] == nil) then
-          iVal.start_date = current_date
-          iVal.due_date = iVal.start_date
-        end
-        iVal.parent=i
-        iVal.subject="Validation"+" of "+ms.to_s
-        iVal.author_id=us
-        iVal.status_id=1
-        iVal.priority_id=1
-        iVal.description="Issue to track " + "validation" + " of "+ms.to_s
-        iVal.custom_fields = []
-        iVal.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-        iVal.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
-        iVal.estimated_hours=8
-        print iVal.custom_fields.to_s
-        done=iVal.save
-        print "Hecho: "+done.to_s+"\n"
-        print "Issue:"+iVal.to_s+"\n"
-        print "Tracker:"+iVal.tracker.id.to_s+"\n"
-        print "Project:"+iVal.project.id.to_s+"\n"
-        if iManuf then
-          precissue=iManuf
-        else
-          precissue=prec[:eng]
-        end
-        if (precissue) then
-          r4=Relation.new
-          r4.prefix_options[:issue_id] = precissue.id
-          r4.issue_id=precissue.id
-          r4.issue_to_id=iVal.id
-          r4.relation_type="precedes"
-          r4.delay=0
-          done=r4.save
-          print "Relation Hecho: "+done.to_s+"\n"
         end
       end
     else
