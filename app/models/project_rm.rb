@@ -7,13 +7,30 @@ class ProjectRm < ActiveRecord::Base
     rm_url        :string
     rm_project    :string
     rm_apikey     :string
+    rm_eosys    :integer, :default => 3
+    rm_eosysid    :integer, :default => 4
+    rm_plm    :string
+    rm_member_sys :string, :default => "sys"
+    rm_member_mech :string, :default => "mech"
+    rm_member_pi :string, :default => "pi"
+    rm_member_opt :string, :default => "opt"
+    rm_member_hw :string, :default => "hw"
+    rm_member_sw :string, :default => "sw"
+    rm_member_metro :string, :default => "metro"
+    rm_member_valid :string, :default => "valid"
+    rm_member_workshop :string, :default => "workshop"
+    rm_member_delin :string, :default => "draftman"
     timestamps
   end
   belongs_to :project, :inverse_of => :project_rms 
   
   has_many :issue_rms, :dependent => :destroy, :inverse_of => :project_rm
   
-  attr_accessible :rm_url, :rm_project, :rm_apikey, :project, :project_id
+  attr_accessible :rm_url, :rm_project, :rm_apikey, :project, :project_id, 
+    :rm_eosys, :rm_eosysid, :rm_plm, :rm_member_sys, :rm_member_mech, 
+    :rm_member_pi, :rm_member_opt, :rm_member_hw, :rm_member_sw, 
+    :rm_member_metro, :rm_member_valid, :rm_member_workshop,
+    :rm_member_delin 
   
   children :issue_rms
 
@@ -68,6 +85,7 @@ class ProjectRm < ActiveRecord::Base
             end
             issue_rm.author = issue.author.id
             issue_rm.tracker = issue.tracker.id
+            issue_rm.assignee = issue.assigned_to.id
             if (issue.custom_fields) then
               issue.custom_fields.each{|f|
                 if f.name=="eosys" then
@@ -124,6 +142,99 @@ class ProjectRm < ActiveRecord::Base
     precedents = {:eng => nil, :delin => nil,
       :manuf => nil, :metro => nil, :valid => nil }
     
+    # Patch, instead of looking for roles, let's look for individuals
+    # TODO: Improve this using team roles instead of login names.
+    members = {:sys => nil, :eng => nil, :delin => nil, :manuf => nil,
+      :metro => nil, :valid => nil }
+
+    all_users=RedmineRest::Models::User.all
+    all_users.each {|t|
+      print "User #{t.login} item:"+t.id.to_s+"\n"
+      if t.login==self.rm_member_sys then
+        members[:sys] = t
+      end
+      if t.login==self.rm_member_metro then
+        members[:metro] = t
+      end
+      if t.login==self.rm_member_mech then
+        members[:eng] = t
+      end
+      if t.login==self.rm_member_valid then
+        members[:valid] = t
+      end
+      if t.login==self.rm_member_delin then
+        members[:delin] = t
+      end
+      if t.login==self.rm_member_workshop then
+        members[:manuf] = t
+      end
+    }
+    
+    trackers = { }
+
+    all_trackers=RedmineRest::Models::Tracker.all
+    all_trackers.each {|t|
+      print "Tracker #{t.name} item:"+t.id.to_s+"\n"
+      if t.name=="Manufacture" then
+        trackers[:manuf] = t
+      else
+        if t.name=="Delineate" then
+          trackers[:delin] = t
+        else
+          if t.name=="Measure" then
+            trackers[:metro] = t
+          else
+            if t.name=="Document" then
+              trackers[:doc] = t
+            else
+              if t.name=="Design" then
+                trackers[:design] = t
+              else
+                if t.name=="Validate" then
+                  trackers[:valid] = t
+                else
+                  if t.name=="Supervise" then
+                    trackers[:superv] = t
+                  else
+                    if t.name=="Fabrication" then
+                      trackers[:fab] = t
+                    else
+                      if t.name=="Commercial" then
+                        trackers[:comm] = t
+                      else
+                        if t.name=="Subcontract" then
+                          trackers[:subctr] = t
+                        else
+                          if t.name=="Integration" then
+                            trackers[:integ] = t
+                          else
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+        
+    }
+
+    statuses = {:resolved => nil, :new => nil}
+    all_statuses = RedmineRest::Models::IssueStatus.all
+    all_statuses.each {|t|
+      print "Statuses #{t.name} item:"+t.id.to_s+"\n"
+      if t.name == "Resolved" then
+        statuses[:resolved] = t
+        print("---> RESOLVED\n")
+      end
+      if t.name == "New" then
+        statuses[:new] = t
+        print("---> NEW\n")
+      end
+    } 
     pr,prid=self.find_rm_project
     existing_issues=self.issue_rms.clone
     systosync = []
@@ -137,82 +248,24 @@ class ProjectRm < ActiveRecord::Base
         systosync << sys
       end
     }
-    #systosync.order(:hierarchical_priority).all[0..10].each{|sys|
     systosync.each{|sys|
-      prec=self.sync_issue(pr,sys,existing_issues,precedents)
+      prec=self.sync_issue(pr,sys,existing_issues,precedents, trackers, members, statuses)
     }
   end
     
-  def create_issue(pr,ms,prec)
+  def create_issue(pr,ms,prec, trackers, members, statuses)
     @patch_already_designed = true
-    @id_custom_field_eosys = 1
-    @id_custom_field_eosysid = 2
     @patch_dont_create_subcontract = true
+    workfltr = nil
     if (ms.acquisition_workflow) then
-      all_trackers=RedmineRest::Models::Tracker.all
-      workfltr=nil
-      manuftr=nil
-      delintr=nil
-      metrotr=nil
-      doctr=nil
-      designtr=nil
-      validtr=nil
-      supervtr=nil
-      all_trackers.each {|t|
-        print "Tracker #{t.name} item:"+t.id.to_s+"\n"
+      trackers.each_key {|k|
+        t=trackers[k]
+        print "Tracker #{t.name} item:"+t.id.to_s+" name:"+ms.acquisition_workflow.name+"\n"
         if t.name==ms.acquisition_workflow.name then
           workfltr = t
         end
-        if t.name=="Manufacture" then
-          manuftr=t
-        else
-          if t.name=="Delineation" then
-            delintr=t
-          else
-            if t.name=="Measure" then
-              metrotr=t
-            else
-              if t.name=="Document" then
-                doctr=t
-              else
-                if t.name=="Design" then
-                  designtr=t
-                else
-                  if t.name=="Validate" then
-                    validtr=t
-                  else
-                    if t.name=="Supervision" then
-                      supervtr = t
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-        
       }
 
-      all_users=RedmineRest::Models::User.all
-      us=nil
-      all_users.each {|t|
-        print "User #{t.login} item:"+t.id.to_s+"\n"
-        if t.login=="txinto" then
-          us=t
-          print ("***** ESTE\n")
-        end
-      }
-=begin      
-      all_statuses = RedmineRest::Models::IssueStatus.all
-      resolvedst = nil
-      all_statuses.each {|t|
-        print "User #{t.name} item:"+t.id.to_s+"\n"
-        if t.name == "Resolved" then
-          resolvedst = t
-          print ("***** ESTE\n")
-        end
-      }
-=end
       current_date=Time.now
       
       if (@patch_dont_create_subcontract == false || workfltr.name!="Subcontract") 
@@ -220,13 +273,13 @@ class ProjectRm < ActiveRecord::Base
         i.project=pr
         i.tracker=workfltr
         i.subject=ms.to_s
-        i.author_id=us
-        i.status_id=1
+        i.assigned_to  = members[:sys]
+        i.status=statuses[:new]
         i.priority_id=1
         i.description="Issue to track " + workfltr.name+" of "+ms.to_s
         i.custom_fields = []
-        i.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-        i.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+        i.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+        i.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
         print i.custom_fields.to_s
         done=i.save
         print "Hecho: "+done.to_s+"\n"
@@ -247,16 +300,16 @@ class ProjectRm < ActiveRecord::Base
                     iSpec.due_date = iSpec.start_date
                   end
                   iSpec.project=pr
-                  iSpec.tracker = doctr
+                  iSpec.tracker = trackers[:doc]
                   iSpec.parent=i
                   iSpec.subject="Spec " + ms.to_s
-                  iSpec.author_id=us
-                  iSpec.status_id=1
+                  iSpec.assigned_to =members[:eng]
+                  iSpec.status=statuses[:new]
                   iSpec.priority_id=1
                   iSpec.description="Issue to track " + "specification" + " of "+ms.to_s
                   iSpec.custom_fields = []
-                  iSpec.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                  iSpec.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                  iSpec.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                  iSpec.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
                   iSpec.estimated_hours=8
                   print iSpec.custom_fields.to_s
                   done=iSpec.save
@@ -279,17 +332,17 @@ class ProjectRm < ActiveRecord::Base
                   iValP.start_date = iSpec.start_date
                   iValP.due_date = iSpec.due_date
                   iValP.project=pr
-                  iValP.tracker=doctr
+                  iValP.tracker=trackers[:doc]
                   iValP.parent=i
                   #i3.blocked_by << i2
                   iValP.subject="VPlan "+ms.to_s
-                  iValP.author_id=us
-                  iValP.status_id=1
+                  iValP.assigned_to =members[:valid]
+                  iValP.status=statuses[:new]
                   iValP.priority_id=1
                   iValP.description="Issue to track " + "validation plan" + " of "+ms.to_s
                   iValP.custom_fields = []
-                  iValP.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                  iValP.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                  iValP.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                  iValP.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
                   iValP.estimated_hours=8
                   print iValP.custom_fields.to_s
                   done=iValP.save
@@ -318,16 +371,16 @@ class ProjectRm < ActiveRecord::Base
                   # Create the Design
                   iDesign=Issue.new
                   iDesign.project=pr
-                  iDesign.tracker=designtr
+                  iDesign.tracker=trackers[:design]
                   iDesign.parent=i
                   iDesign.subject=ms.to_s
-                  iDesign.author_id=us
-                  iDesign.status_id=1
+                  iDesign.assigned_to =members[:eng]
+                  iDesign.status=statuses[:new]
                   iDesign.priority_id=1
                   iDesign.description="Issue to track " + "design" + " of "+ms.to_s
                   iDesign.custom_fields = []
-                  iDesign.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                  iDesign.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                  iDesign.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                  iDesign.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
                   iDesign.estimated_hours=8
                   print iDesign.custom_fields.to_s
                   done=iDesign.save
@@ -351,7 +404,7 @@ class ProjectRm < ActiveRecord::Base
                 # Create the Delineation
                 iDelin=Issue.new
                 iDelin.project=pr
-                iDelin.tracker=delintr
+                iDelin.tracker=trackers[:delin]
                 if (@patch_already_designed) then
                   if (prec[:delin] == nil) then
                     iDelin.start_date = current_date
@@ -360,13 +413,13 @@ class ProjectRm < ActiveRecord::Base
                 end
                 iDelin.parent=i
                 iDelin.subject=ms.to_s
-                iDelin.author_id=us
-                iDelin.status_id=1
+                iDelin.assigned_to =members[:delin]
+                iDelin.status=statuses[:new]
                 iDelin.priority_id=1
                 iDelin.description="Issue to track " + "delineation" + " of "+ms.to_s
                 iDelin.custom_fields = []
-                iDelin.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                iDelin.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                iDelin.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                iDelin.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
                 iDelin.estimated_hours=8
                 print iDelin.custom_fields.to_s
                 done=iDelin.save
@@ -402,7 +455,7 @@ class ProjectRm < ActiveRecord::Base
                 # Supervise the delineation
                 iDelinSup=Issue.new
                 iDelinSup.project = pr
-                iDelinSup.tracker = supervtr
+                iDelinSup.tracker = trackers[:superv]
                 if (@patch_already_designed) then
                   if (prec[:delin] == nil) then
                     iDelinSup.start_date = iDelin.start_date
@@ -411,13 +464,13 @@ class ProjectRm < ActiveRecord::Base
                 end
                 iDelinSup.parent=i
                 iDelinSup.subject="Sv Delin "+ms.to_s
-                iDelinSup.author_id=us
-                iDelinSup.status_id=1
+                iDelinSup.assigned_to =members[:eng]
+                iDelinSup.status=statuses[:new]
                 iDelinSup.priority_id=1
                 iDelinSup.description="Issue to track " + "delineation supervision" + " of "+ms.to_s
                 iDelinSup.custom_fields = []
-                iDelinSup.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-                iDelinSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+                iDelinSup.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                iDelinSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
                 iDelinSup.estimated_hours=8
                 print iDelinSup.custom_fields.to_s
                 done=iDelinSup.save
@@ -465,24 +518,25 @@ class ProjectRm < ActiveRecord::Base
             # Manufacture it
             iManuf=Issue.new
             iManuf.project=pr
-            iManuf.tracker=manuftr
+            iManuf.tracker=trackers[:manuf]
             if (iDelin == nil and prec[:manuf] == nil) then
               iManuf.start_date = current_date
               iManuf.due_date = iManuf.start_date
             end
             iManuf.parent=i
             iManuf.subject=ms.to_s
-            iManuf.status_id=1
+            iManuf.status=statuses[:new]
+            iManuf.assigned_to =members[:manuf]
             iManuf.priority_id=1
             iManuf.description="Issue to track " + "manufacturing" + " of "+ms.to_s
             iManuf.custom_fields = []
-            iManuf.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-            iManuf.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+            iManuf.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+            iManuf.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
             iManuf.estimated_hours=8
             print iManuf.custom_fields.to_s
             done=iManuf.save
             if (ms.acquisition_status.name=="Manufactured") then
-              iManuf.status_id=3
+              iManuf.status_id = statuses[:resolved].id
               iManuf.done_ratio=100
             end
             done=iManuf.save
@@ -512,7 +566,7 @@ class ProjectRm < ActiveRecord::Base
             # Supervise the manufacturing
             iManufSup=Issue.new
             iManufSup.project = pr
-            iManufSup.tracker = supervtr
+            iManufSup.tracker = trackers[:superv]
             if (iDelin == nil and prec[:manuf] == nil) then
               if (iManuf) then
                 iManufSup.start_date = iManuf.start_date
@@ -524,13 +578,13 @@ class ProjectRm < ActiveRecord::Base
             end
             iManufSup.parent=i
             iManufSup.subject="Sv Manuf "+ms.to_s
-            iManufSup.author_id=us
-            iManufSup.status_id=1
+            iManufSup.assigned_to =members[:eng]
+            iManufSup.status=statuses[:new]
             iManufSup.priority_id=1
             iManufSup.description="Issue to track " + "manufacturing supervision" + " of "+ms.to_s
             iManufSup.custom_fields = []
-            iManufSup.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-            iManufSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+            iManufSup.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+            iManufSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
             iManufSup.estimated_hours=8
             print iManufSup.custom_fields.to_s
             done=iManufSup.save
@@ -570,16 +624,16 @@ class ProjectRm < ActiveRecord::Base
             # Metrology
             iMetro=Issue.new
             iMetro.project=pr
-            iMetro.tracker=metrotr
+            iMetro.tracker=trackers[:metro]
             iMetro.parent=i
             iMetro.subject=ms.to_s
-            iMetro.author_id=us
-            iMetro.status_id=1
+            iMetro.assigned_to  = members[:metro]
+            iMetro.status=statuses[:new]
             iMetro.priority_id=1
             iMetro.description="Issue to track " + "metrology" + " of "+ms.to_s
             iMetro.custom_fields = []
-            iMetro.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-            iMetro.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+            iMetro.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+            iMetro.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
             iMetro.estimated_hours=8
             print iMetro.custom_fields.to_s
             done=iMetro.save
@@ -641,20 +695,20 @@ class ProjectRm < ActiveRecord::Base
           # Validation
           iVal=Issue.new
           iVal.project=pr
-          iVal.tracker=validtr
+          iVal.tracker=trackers[:valid]
           if (iManuf == nil and prec[:eng] == nil) then
             iVal.start_date = current_date
             iVal.due_date = iVal.start_date
           end
           iVal.parent=i
           iVal.subject=ms.to_s
-          iVal.author_id=us
-          iVal.status_id=1
+          iVal.assigned_to =members[:valid]
+          iVal.status=statuses[:new]
           iVal.priority_id=1
           iVal.description="Issue to track " + "validation" + " of "+ms.to_s
           iVal.custom_fields = []
-          iVal.custom_fields << {:name => 'eosys', :value => true, :id => @id_custom_field_eosys}
-          iVal.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => @id_custom_field_eosysid}
+          iVal.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+          iVal.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
           iVal.estimated_hours=8
           print iVal.custom_fields.to_s
           done=iVal.save
@@ -685,7 +739,7 @@ class ProjectRm < ActiveRecord::Base
     return prec
   end
     
-  def sync_issue(pr,sys,exiss,prec)
+  def sync_issue(pr,sys,exiss,prec, trackers, members, statuses)
     found=false
     # Find correct tracker
     sys.mech_systems.each{ |ms|
@@ -701,7 +755,7 @@ class ProjectRm < ActiveRecord::Base
 =end borra issues rms duplicados
       if (not(found)) then
         # The issue workflow has to be created
-        prec=self.create_issue(pr,ms,prec)
+        prec=self.create_issue(pr,ms,prec, trackers, members, statuses)
       end
     }
     return prec

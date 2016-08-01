@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160727180902) do
+ActiveRecord::Schema.define(version: 20160801172608) do
 
   create_table "acquisition_statuses", force: :cascade do |t|
     t.string   "name"
@@ -175,6 +175,19 @@ ActiveRecord::Schema.define(version: 20160727180902) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "project_id"
+    t.integer  "rm_eosys",           default: 3
+    t.integer  "rm_eosysid",         default: 4
+    t.string   "rm_plm"
+    t.string   "rm_member_sys",      default: "sys"
+    t.string   "rm_member_mech",     default: "mech"
+    t.string   "rm_member_pi",       default: "pi"
+    t.string   "rm_member_opt",      default: "opt"
+    t.string   "rm_member_hw",       default: "hw"
+    t.string   "rm_member_sw",       default: "sw"
+    t.string   "rm_member_metro",    default: "metro"
+    t.string   "rm_member_valid",    default: "valid"
+    t.string   "rm_member_workshop", default: "workshop"
+    t.string   "rm_member_delin",    default: "draftman"
   end
 
   add_index "project_rms", ["project_id"], name: "index_project_rms_on_project_id"
