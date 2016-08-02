@@ -147,29 +147,44 @@ class ProjectRm < ActiveRecord::Base
     members = {:sys => nil, :eng => nil, :delin => nil, :manuf => nil,
       :metro => nil, :valid => nil }
 
-    all_users=RedmineRest::Models::User.all
-    all_users.each {|t|
-      print "User #{t.login} item:"+t.id.to_s+"\n"
-      if t.login==self.rm_member_sys then
-        members[:sys] = t
+    pending_users=true
+    pending_offset=0
+    while (pending_users) do
+      users=RedmineRest::Models::User.where(active:true, offset:pending_offset, order:('id desc'))
+      if (users != nil) then
+        print("\n\n\n\n\n\n\n\n\ntengo users = "+users.size.to_s)
+        pending_offset+=users.size
+        if (users.size>0) then
+          print("\ntengo users = "+users.size.to_s)
+          users.each {|t|
+            print "User #{t.login} item:"+t.id.to_s+"\n"
+            if t.login==self.rm_member_sys then
+              members[:sys] = t
+            end
+            if t.login==self.rm_member_metro then
+              members[:metro] = t
+            end
+            if t.login==self.rm_member_mech then
+              members[:eng] = t
+            end
+            if t.login==self.rm_member_valid then
+              members[:valid] = t
+            end
+            if t.login==self.rm_member_delin then
+              members[:delin] = t
+            end
+            if t.login==self.rm_member_workshop then
+              members[:manuf] = t
+            end
+          }
+        else
+          pending_users = false
+        end
+      else
+        pending_users = false
       end
-      if t.login==self.rm_member_metro then
-        members[:metro] = t
-      end
-      if t.login==self.rm_member_mech then
-        members[:eng] = t
-      end
-      if t.login==self.rm_member_valid then
-        members[:valid] = t
-      end
-      if t.login==self.rm_member_delin then
-        members[:delin] = t
-      end
-      if t.login==self.rm_member_workshop then
-        members[:manuf] = t
-      end
-    }
-    
+    end
+    print ("Users --->"+members.to_s+"\n")
     trackers = { }
 
     all_trackers=RedmineRest::Models::Tracker.all
@@ -234,7 +249,8 @@ class ProjectRm < ActiveRecord::Base
         statuses[:new] = t
         print("---> NEW\n")
       end
-    } 
+      } 
+
     pr,prid=self.find_rm_project
     existing_issues=self.issue_rms.clone
     systosync = []
@@ -251,6 +267,7 @@ class ProjectRm < ActiveRecord::Base
     systosync.each{|sys|
       prec=self.sync_issue(pr,sys,existing_issues,precedents, trackers, members, statuses)
     }
+
   end
     
   def create_issue(pr,ms,prec, trackers, members, statuses)
