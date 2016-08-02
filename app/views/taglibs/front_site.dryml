@@ -77,6 +77,13 @@
                                 </ht>
                             </a:functions> 
                         </append-functions-collection-section:>
+                        <append-project_rms-collection-section:>
+                                <a:project_rms action="new" if="&can_create?(@project.project_rms)" param="new-link">
+                                    <ht key="project_rm.actions.new" count="1">
+                                        New Redmine Link
+                                    </ht>
+                                </a:project_rms>		
+                        </append-project_rms-collection-section:>
                         </old-show-page>
                         </extend>
 
@@ -110,11 +117,14 @@
                                 </prepend-aside:>	
                                 <append-mech_systems-collection-section:>
                                         <a:mech_systems action="new" if="&can_create?(@system.mech_systems)" param="new-link">
-                                            <ht key="system.actions.new_mech_system" count="1">
+                                            <ht key="mech_system.actions.new" count="1">
                                                 New Mech System
                                             </ht>
                                         </a:mech_systems>		
                                 </append-mech_systems-collection-section:>
+								<append-aside:>
+									XCos: <a:xcos-box/>
+								</append-aside:>
                                 
                             </old-show-page>
                         </extend>

@@ -2,8 +2,9 @@ class ProjectRmsController < ApplicationController
 
   hobo_model_controller
 
-  auto_actions :all
-  
+  auto_actions :all, :except => [:index, :new, :create]
+  auto_actions_for :project, [:new,:create]
+
   web_method :sync_issues
   web_method :destroy_issues
   

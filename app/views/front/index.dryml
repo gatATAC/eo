@@ -6,11 +6,8 @@
     <header class="content-header hero-unit">
       <h1>Welcome to <app-name/></h1>
       <section class="welcome-message">
-        <h3>Congratulations! Your Hobo Rails App is up and running</h3>
-        <ul>
-          <li>To customise this page: edit app/views/front/index.dryml</li>
-        </ul>
-
+          <h3>System Engineering Toolkit</h3>
+          <p><copyright/></p>
         <% if User.count == 0 -%>
           <h3 style="margin-top: 20px;">There are no user accounts - please provide the details of the site administrator</h3>
           <form with="&this || User.new" without-cancel>
@@ -23,7 +20,15 @@
       </section>
     </header>
 
-    <section class="content-body">
+    <section with="&current_user" class="content-body" if="&logged_in?">
+      <div if="developer?">
+        <h3>Your projects</h3>
+        <collection:projects><card without-creator-link/></collection>
+
+        <a:projects action="new">New Project</a>
+      </div>
+      <h3>Joined projects</h3>
+      <collection:project_memberships><card without-creator-link/></collection>
     </section>
   </content:>
 

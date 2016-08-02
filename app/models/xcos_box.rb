@@ -10,6 +10,9 @@ class XcosBox < ActiveRecord::Base
   
   attr_accessible :system, :system_id
 
+  def to_s
+    system.to_s
+  end
 
   def xcos_id
     self.system.project.xcos_id+":s"+self.system.id.to_s

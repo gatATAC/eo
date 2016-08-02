@@ -3,9 +3,11 @@ you can place common code in this file. -->
 
 <def tag="copyright">
   <div class="copyright" param>
-    (c) 2013 <a href="http://gatatac.org" target="_blank">gatATAC.org</a> - <a href="http://gatatac.org/projects/ucanca/wiki" target="_blank">uCANca project</a> - Txinto Vaz
+    (c) 2016 <a href="http://gatatac.org" target="_blank">gatATAC.org</a> - <a href="http://gatatac.org/projects/eo/wiki" target="_blank">EO project</a> - Txinto Vaz
   </div>
 </def>
+
+<def tag="app-name"><img src="/images/gatatac.png"/>Eo Systems</def>
 
 <def tag="eofooter">
   <div class="eofooter" param>
