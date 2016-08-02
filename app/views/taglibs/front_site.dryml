@@ -122,10 +122,9 @@
                                             </ht>
                                         </a:mech_systems>		
                                 </append-mech_systems-collection-section:>
-								<append-aside:>
-									XCos: <a:xcos-box/>
-								</append-aside:>
-                                
+								<prepend-collection-section:>
+									<p>XCos: <a:xcos-box/></p>
+								</prepend-collection-section:>
                             </old-show-page>
                         </extend>
 
