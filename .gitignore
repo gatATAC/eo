@@ -22,3 +22,4 @@ config/hobo_routes.rb
 .DS_Store
 /nbproject/private/
 
+vendor/*

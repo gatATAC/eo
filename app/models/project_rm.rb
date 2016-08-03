@@ -122,7 +122,7 @@ class ProjectRm < ActiveRecord::Base
   def destroy_rm_issues(destroy_redmine, destroy_local)
     self.issue_rms.each{|rm|
       if (destroy_redmine) then
-        i=Issue.find_by_id(rm.rm_ident)
+        i=RedmineRest::Models::Issue.find_by_id(rm.rm_ident)
         if (i) then
           i.destroy
         end
@@ -134,6 +134,7 @@ class ProjectRm < ActiveRecord::Base
   end
   
   def destroy_all_issues
+    RedmineRest::Models.configure_models apikey:self.rm_apikey, site:self.rm_url
     self.destroy_rm_issues(true,true)
   end
   

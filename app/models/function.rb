@@ -188,7 +188,7 @@ class Function < ActiveRecord::Base
 
   def destroy_permitted?
   if project then
-      ret=project.destroyable_by?(acting_user)
+      ret=project.updatable_by?(acting_user)
     else
       ret=false
     end

@@ -7,12 +7,14 @@ class ProjectRmsController < ApplicationController
 
   web_method :sync_issues
   web_method :destroy_issues
-  
-  before_action :reload_issues, :only => :show
+  web_method :reload_issues
+    
+  #before_action :reload_issues, :only => :show
 
   def reload_issues
     @project_rm = find_instance
     find_instance.reload_issues
+    redirect_to this    
   end
   
   def sync_issues

@@ -7,6 +7,7 @@ class AddIssueRms < ActiveRecord::Migration
       t.integer  :project_rm_id
     end
     add_index :issue_rms, [:project_rm_id]
+       
   end
 
   def self.down

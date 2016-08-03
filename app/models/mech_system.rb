@@ -41,6 +41,18 @@ class MechSystem < ActiveRecord::Base
   def to_s
     self.system.to_s
   end
+  
+  def is_built
+    ret=false
+    if (not(self.system.is_part_of_acquired)) then
+      if (self.acquisition_status) then
+        ret=self.acquisition_status.built
+      end
+    else
+      ret=true
+    end
+    return ret
+  end
   # --- Permissions --- #
 
   def create_permitted?

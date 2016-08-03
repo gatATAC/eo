@@ -78,11 +78,11 @@
                             </a:functions> 
                         </append-functions-collection-section:>
                         <append-project_rms-collection-section:>
-                                <a:project_rms action="new" if="&can_create?(@project.project_rms)" param="new-link">
-                                    <ht key="project_rm.actions.new" count="1">
-                                        New Redmine Link
-                                    </ht>
-                                </a:project_rms>		
+                            <a:project_rms action="new" if="&can_create?(@project.project_rms)" param="new-link">
+                                <ht key="project_rm.actions.new" count="1">
+                                    New Redmine Link
+                                </ht>
+                            </a:project_rms>		
                         </append-project_rms-collection-section:>
                         </old-show-page>
                         </extend>
@@ -93,42 +93,40 @@
 
                                 <field-list: fields="abbrev, system_type, parent, root, project, layer, full_name, is_part_of_virtual, is_part_of_atomic, is_part_of_acquired" param/>
 
-                                <append-collection-section:>
-                                        <a:project.systems action="new" if="&can_create?(@system.project.systems)" param="new-link" params="&{:super_system =>@system.id}">
-                                            <ht key="system.actions.new_child" count="1">
-                                                New Child System
-                                            </ht>
-                                        </a:project.systems>		
-
-                                </append-collection-section:>
+                                <append-content-body:>
+                                    <a:project.systems action="new" if="&can_create?(@system.project.systems)" param="new-link" params="&{:super_system =>@system.id}">
+                                        <ht key="system.actions.new_child" count="1">
+                                            New Child System
+                                        </ht>
+                                    </a:project.systems>
+                                </append-content-body:>
                                 <prepend-aside:>
                                     <%= link_to("SVG Diagram #{@system.name}", [@system, :only_path => :true, :format => :svg]) %>
                                     <embed src="./#{this.id}.svg" type="image/svg+xml" />
-                                        <p><b>Tree:</b>
-                                        <div id="ajaxtree">
-                                            <%= link_to("Full Tree Diagram #{@system.name}", [@system, :only_path => :true, :format => :tree]) %>
-                                            <embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" />
-                                        </div>
-                                        <div id="ajaxpendingtree">
-                                            <%= link_to("Pending tree #{@system.name}", [@system, :action => :pending, :only_path => :true, :format => :tree]) %>
-                                            <embed src="./#{this.id}/pending.tree" width="100%" height="300px" style="border: 1px solid" />
-                                        </div>
-                                        </p>
+                                    <p><b>Tree:</b>
+                                    <div id="ajaxtree">
+                                        <%= link_to("Full Tree Diagram #{@system.name}", [@system, :only_path => :true, :format => :tree]) %>
+                                        <embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" />
+                                    </div>
+                                    <div id="ajaxpendingtree">
+                                        <%= link_to("Pending tree #{@system.name}", [@system, :action => :pending, :only_path => :true, :format => :tree]) %>
+                                        <embed src="./#{this.id}/pending.tree" width="100%" height="300px" style="border: 1px solid" />
+                                    </div>
+                                    </p>
                                 </prepend-aside:>	
                                 <append-mech_systems-collection-section:>
-                                        <a:mech_systems action="new" if="&can_create?(@system.mech_systems)" param="new-link">
-                                            <ht key="mech_system.actions.new" count="1">
-                                                New Mech System
-                                            </ht>
-                                        </a:mech_systems>		
+                                    <a:mech_systems action="new" if="&can_create?(@system.mech_systems)" param="new-link">
+                                        <ht key="mech_system.actions.new" count="1">
+                                            New Mech System
+                                        </ht>
+                                    </a:mech_systems>		
                                 </append-mech_systems-collection-section:>
-								<prepend-collection-section:>
-									<p>XCos: <a:xcos-box/></p>
-								</prepend-collection-section:>
+                                <prepend-collection-section:>
+                                    <p>XCos: <a:xcos-box/></p>
+                                </prepend-collection-section:>
                             </old-show-page>
                         </extend>
 
-                        <def tag="new-for-project-page" polymorphic/>
                         <def tag="new-for-project-page" for="System">
                             <page merge title="#{ht 'system.new_for_owner.title', :default=>['New System for']} #{name :with => @project} and supersystem=params[:super_system]">
                                 <body: class="new-for-owner-page  system" param/>
@@ -198,7 +196,6 @@
                             </old-show-page>
                         </extend>
 
-                        <def tag="new-for-project-page" polymorphic/>
                         <def tag="new-for-project-page" for="Function">
                             <page merge title="#{ht 'function.new_for_owner.title', :default=>['New Function for']} #{name :with => @project} and superfunction=params[:super_function]">
                                 <body: class="new-for-owner-page  function" param/>
@@ -235,25 +232,26 @@
                             </page>
                         </def>
 
-<extend tag="show-page" for="ProjectRm">
-    <old-show-page merge>
-        <prepend-collection-section:>
-            <ul>
-                <li><%= link_to("Sync Issues", [@project_rm, :action => :sync_issues , :only_path => :true], :method => :post) %></li>
-                <li><%= link_to("Destroy all project Issues", [@project_rm, :action => :destroy_issues , :only_path => :true], :method => :post) %></li>
-            </ul>
-        </prepend-collection-section:>
-    </old-show-page>
-</extend>
-<extend tag="show-page" for="Project">
-    <old-show-page merge>
-        <append-content:>
-          <div class="import-section" if="&can_update?(@project)">
-            Project Item data importers:
-            <ul>
-                <li><%= link_to "Import Project Items", :only_path => :true, :controller => :project_imports, :action => :new, :project_id => @project.id %></li>
-            </ul>
-            </div>
-        </append-content:>      
-    </old-show-page>
-</extend>
+                        <extend tag="show-page" for="ProjectRm">
+                            <old-show-page merge>
+                                <prepend-collection-section:>
+                                    <ul>
+                                        <li><%= link_to("Reload Issues", [@project_rm, :action => :reload_issues , :only_path => :true], :method => :post) %></li>
+                                        <li><%= link_to("Create Issues", [@project_rm, :action => :sync_issues , :only_path => :true], :method => :post) %></li>
+                                        <li><%= link_to("Destroy all project Issues", [@project_rm, :action => :destroy_issues , :only_path => :true], :method => :post) %></li>
+                                    </ul>
+                                </prepend-collection-section:>
+                            </old-show-page>
+                        </extend>
+                        <extend tag="show-page" for="Project">
+                            <old-show-page merge>
+                                <append-content:>
+                                    <div class="import-section" if="&can_update?(@project)">
+                                        Project Item data importers:
+                                        <ul>
+                                            <li><%= link_to "Import Project Items", :only_path => :true, :controller => :project_imports, :action => :new, :project_id => @project.id %></li>
+                                        </ul>
+                                    </div>
+                                </append-content:>      
+                            </old-show-page>
+                        </extend>

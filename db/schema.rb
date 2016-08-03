@@ -11,13 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160801172608) do
+ActiveRecord::Schema.define(version: 20160803120748) do
 
   create_table "acquisition_statuses", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "acquisition_workflow_id"
+    t.boolean  "closed",                  default: false
+    t.boolean  "built",                   default: false
   end
 
   add_index "acquisition_statuses", ["acquisition_workflow_id"], name: "index_acquisition_statuses_on_acquisition_workflow_id"
