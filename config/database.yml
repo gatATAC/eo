@@ -20,6 +20,14 @@ test:
   <<: *default
   database: db/test.sqlite3
 
+#production:
+#  <<: *default
+#  database: db/production.sqlite3
+
 production:
-  <<: *default
-  database: db/production.sqlite3
+  adapter: mysql2
+  database: eo
+  host: localhost
+  username: eo
+  password: "xKmSzy44A7wVQn6Q" 
+  encoding: utf8
