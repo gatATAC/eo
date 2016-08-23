@@ -106,11 +106,11 @@
                                     <p><b>Tree:</b>
                                     <div id="ajaxtree">
                                         <%= link_to("Full Tree Diagram #{@system.name}", [@system, :only_path => :true, :format => :tree]) %>
-                                        <embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" />
+                                        <!--embed src="./#{this.id}.tree" width="100%" height="300px" style="border: 1px solid" /-->
                                     </div>
                                     <div id="ajaxpendingtree">
                                         <%= link_to("Pending tree #{@system.name}", [@system, :action => :pending, :only_path => :true, :format => :tree]) %>
-                                        <embed src="./#{this.id}/pending.tree" width="100%" height="300px" style="border: 1px solid" />
+                                        <!-- embed src="./#{this.id}/pending.tree" width="100%" height="300px" style="border: 1px solid" /-->
                                     </div>
                                     </p>
                                 </prepend-aside:>	

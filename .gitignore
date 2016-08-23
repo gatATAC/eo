@@ -24,3 +24,4 @@ config/hobo_routes.rb
 
 vendor/*
 db/dump/*
+db/data.yml
