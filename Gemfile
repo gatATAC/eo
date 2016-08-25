@@ -90,5 +90,7 @@ gem 'redmine_rest'
 ######## To dump database
 gem 'yaml_db'
 
-gem 'mysql2'
+group :production do
+  gem 'mysql2'
+end
 
