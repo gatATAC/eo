@@ -4,9 +4,10 @@ class AcquisitionWorkflow < ActiveRecord::Base
 
   fields do
     name :string
+    keystr :string
     timestamps
   end
-  attr_accessible :name
+  attr_accessible :name, :keystr
 
   has_many :mech_systems, :inverse_of => :acquisition_workflow
   has_many :acquisition_statuses, :inverse_of => :acquisition_workflow,

@@ -4,11 +4,13 @@ class AcquisitionStatus < ActiveRecord::Base
 
   fields do
     name :string
+    keystr :string
     closed :boolean, :default => :false
     built :boolean, :default => :false
     timestamps
   end
-  attr_accessible :name, :acquisition_worflow, :acquisition_workflow_id, :closed, :built
+  attr_accessible :name, :acquisition_worflow, :acquisition_workflow_id, 
+    :closed, :built, :keystr
   
   belongs_to :acquisition_workflow, :inverse_of => :acquisition_statuses,
     :creator => :true

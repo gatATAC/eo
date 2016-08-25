@@ -20,6 +20,21 @@ class ProjectRm < ActiveRecord::Base
     rm_member_valid :string, :default => "valid"
     rm_member_workshop :string, :default => "workshop"
     rm_member_delin :string, :default => "draftman"
+    rm_tracker_manuf :string, :default => "Manufacture"
+    rm_tracker_delin :string, :default => "Delineate"
+    rm_tracker_meas :string, :default => "Measure"
+    rm_tracker_doc :string, :default => "Document"
+    rm_tracker_design :string, :default => "Design"
+    rm_tracker_valid :string, :default => "Validate"
+    rm_tracker_superv :string, :default => "Supervise"
+    rm_tracker_fab :string, :default => "Fabrication"
+    rm_tracker_com :string, :default => "Commercial"
+    rm_tracker_subc :string, :default => "Subcontract"
+    rm_tracker_integ :string, :default => "Integration"
+    rm_status_resolved :string, :default => "Resolved"
+    rm_status_new :string, :default => "New"
+
+      
     timestamps
   end
   belongs_to :project, :inverse_of => :project_rms 
@@ -30,7 +45,10 @@ class ProjectRm < ActiveRecord::Base
     :rm_eosys, :rm_eosysid, :rm_plm, :rm_member_sys, :rm_member_mech, 
     :rm_member_pi, :rm_member_opt, :rm_member_hw, :rm_member_sw, 
     :rm_member_metro, :rm_member_valid, :rm_member_workshop,
-    :rm_member_delin 
+    :rm_member_delin, :rm_tracker_manuf, :rm_tracker_delin, :rm_tracker_meas,
+    :rm_tracker_doc, :rm_tracker_design, :rm_tracker_valid, :rm_tracker_superv,
+    :rm_tracker_fab, :rm_tracker_com, :rm_tracker_subc, :rm_tracker_integ,
+    :rm_status_resolved, :rm_status_new
   
   children :issue_rms
 
@@ -159,22 +177,22 @@ class ProjectRm < ActiveRecord::Base
           print("\ntengo users = "+users.size.to_s)
           users.each {|t|
             print "User #{t.login} item:"+t.id.to_s+"\n"
-            if t.login==self.rm_member_sys then
+            if t.login == self.rm_member_sys then
               members[:sys] = t
             end
-            if t.login==self.rm_member_metro then
+            if t.login == self.rm_member_metro then
               members[:metro] = t
             end
-            if t.login==self.rm_member_mech then
+            if t.login == self.rm_member_mech then
               members[:eng] = t
             end
-            if t.login==self.rm_member_valid then
+            if t.login == self.rm_member_valid then
               members[:valid] = t
             end
-            if t.login==self.rm_member_delin then
+            if t.login == self.rm_member_delin then
               members[:delin] = t
             end
-            if t.login==self.rm_member_workshop then
+            if t.login == self.rm_member_workshop then
               members[:manuf] = t
             end
           }
@@ -191,39 +209,51 @@ class ProjectRm < ActiveRecord::Base
     all_trackers=RedmineRest::Models::Tracker.all
     all_trackers.each {|t|
       print "Tracker #{t.name} item:"+t.id.to_s+"\n"
-      if t.name=="Manufacture" then
+      if t.name==self.rm_tracker_manuf then
         trackers[:manuf] = t
+        print ">>> manuf\n"
       else
-        if t.name=="Delineate" then
+        if t.name==self.rm_tracker_delin then
           trackers[:delin] = t
+          print ">>> delin\n"
         else
-          if t.name=="Measure" then
+          if t.name == self.rm_tracker_meas then
             trackers[:metro] = t
+            print ">>> metro\n"
           else
-            if t.name=="Document" then
+            if t.name == self.rm_tracker_doc then
               trackers[:doc] = t
+              print ">>> doc\n"
             else
-              if t.name=="Design" then
+              if t.name == self.rm_tracker_design then
                 trackers[:design] = t
+                print ">>> design\n"
               else
-                if t.name=="Validate" then
+                if t.name == self.rm_tracker_valid then
                   trackers[:valid] = t
+                  print ">>> valid\n"
                 else
-                  if t.name=="Supervise" then
+                  if t.name == self.rm_tracker_superv then
                     trackers[:superv] = t
+                    print ">>> superv\n"
                   else
-                    if t.name=="Fabrication" then
+                    if t.name == self.rm_tracker_fab then
                       trackers[:fab] = t
+                      print ">>> fab\n"
                     else
-                      if t.name=="Commercial" then
+                      if t.name == self.rm_tracker_com then
                         trackers[:comm] = t
+                        print ">>> comm\n"
                       else
-                        if t.name=="Subcontract" then
+                        if t.name == self.rm_tracker_subc then
                           trackers[:subctr] = t
+                          print ">>> subctr\n"
                         else
-                          if t.name=="Integration" then
+                          if t.name == self.rm_tracker_integ then
                             trackers[:integ] = t
+                            print ">>> integ\n"
                           else
+                            print ">>> not recognized\n"                            
                           end
                         end
                       end
@@ -242,11 +272,11 @@ class ProjectRm < ActiveRecord::Base
     all_statuses = RedmineRest::Models::IssueStatus.all
     all_statuses.each {|t|
       print "Statuses #{t.name} item:"+t.id.to_s+"\n"
-      if t.name == "Resolved" then
+      if t.name == self.rm_status_resolved then
         statuses[:resolved] = t
         print("---> RESOLVED\n")
       end
-      if t.name == "New" then
+      if t.name == self.rm_status_new then
         statuses[:new] = t
         print("---> NEW\n")
       end
@@ -268,7 +298,6 @@ class ProjectRm < ActiveRecord::Base
     systosync.each{|sys|
       prec=self.sync_issue(pr,sys,existing_issues,precedents, trackers, members, statuses)
     }
-
   end
     
   def create_issue(pr,ms,prec, trackers, members, statuses)
@@ -276,14 +305,8 @@ class ProjectRm < ActiveRecord::Base
     @patch_dont_create_subcontract = true
     workfltr = nil
     if (ms.acquisition_workflow) then
-      trackers.each_key {|k|
-        t=trackers[k]
-        print "Tracker #{t.name} item:"+t.id.to_s+" name:"+ms.acquisition_workflow.name+"\n"
-        if t.name==ms.acquisition_workflow.name then
-          workfltr = t
-        end
-      }
-
+      workfltr = trackers[ms.acquisition_workflow.keystr.to_sym]
+      
       current_date=Time.now
       
       if (@patch_dont_create_subcontract == false || workfltr.name!="Subcontract") 
