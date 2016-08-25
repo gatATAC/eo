@@ -86,3 +86,11 @@ gem 'morrisjs-rails'
 gem 'raphael-rails'
 
 gem 'redmine_rest'
+
+######## To dump database
+gem 'yaml_db'
+
+group :production do
+  gem 'mysql2'
+end
+

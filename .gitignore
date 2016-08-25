@@ -23,3 +23,7 @@ config/hobo_routes.rb
 /nbproject/private/
 
 vendor/*
+db/dump/*
+db/data.yml
+
+passenger.*

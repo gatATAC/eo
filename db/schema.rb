@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160806120748) do
+ActiveRecord::Schema.define(version: 20160825151652) do
 
   create_table "acquisition_statuses", force: :cascade do |t|
     t.string   "name"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20160806120748) do
     t.integer  "acquisition_workflow_id"
     t.boolean  "closed",                  default: false
     t.boolean  "built",                   default: false
+    t.string   "keystr"
   end
 
   add_index "acquisition_statuses", ["acquisition_workflow_id"], name: "index_acquisition_statuses_on_acquisition_workflow_id"
@@ -28,6 +29,7 @@ ActiveRecord::Schema.define(version: 20160806120748) do
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "keystr"
   end
 
   create_table "function_link_types", force: :cascade do |t|
@@ -190,6 +192,19 @@ ActiveRecord::Schema.define(version: 20160806120748) do
     t.string   "rm_member_valid",    default: "valid"
     t.string   "rm_member_workshop", default: "workshop"
     t.string   "rm_member_delin",    default: "draftman"
+    t.string   "rm_tracker_manuf",   default: "Manufacture"
+    t.string   "rm_tracker_delin",   default: "Delineate"
+    t.string   "rm_tracker_meas",    default: "Measure"
+    t.string   "rm_tracker_doc",     default: "Document"
+    t.string   "rm_tracker_design",  default: "Design"
+    t.string   "rm_tracker_valid",   default: "Validate"
+    t.string   "rm_tracker_superv",  default: "Supervise"
+    t.string   "rm_tracker_fab",     default: "Fabrication"
+    t.string   "rm_tracker_com",     default: "Commercial"
+    t.string   "rm_tracker_subc",    default: "Subcontract"
+    t.string   "rm_tracker_integ",   default: "Integration"
+    t.string   "rm_status_resolved", default: "Resolved"
+    t.string   "rm_status_new",      default: "New"
   end
 
   add_index "project_rms", ["project_id"], name: "index_project_rms_on_project_id"
