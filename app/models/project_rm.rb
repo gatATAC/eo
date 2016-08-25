@@ -307,10 +307,11 @@ class ProjectRm < ActiveRecord::Base
       
         # Creamos las sub issues
         if (ms.acquisition_workflow.name=="Fabrication") then
-          if (ms.acquisition_status.name!="Validation") then
+          if (ms.acquisition_status.name!="Measured") then
             if (ms.acquisition_status.name!="Manufactured") then
-              if (ms.acquisition_status.name!="Manufacturing") then
-                if (not(@patch_already_designed)) then
+              if (ms.acquisition_status.name!="Deligned") then
+                if (not(@patch_already_designed) and ms.acquisition_status.name!="Designed") then
+                  # TO DO: Import other statuses
                   # Create the spec
                   iSpec=Issue.new
                   if (prec[:eng]==nil) then

@@ -28,7 +28,6 @@ class ProjectImport
     header = ucanca_sheet.row(1)
     (2..ucanca_sheet.last_row).map do |i|
       row = Hash[[header, ucanca_sheet.row(i)].transpose]
-      print "procesamos -----------> "+row.to_s
       # A system MUST have an abbrev
       rabbrev=row["abbrev"]
       if (rabbrev!=nil && rabbrev!="")
@@ -88,12 +87,16 @@ class ProjectImport
                   if (mechmach.valid?) then
                     mechmach.save!
                   else
+                    print "\nerror procesando "+row.to_s
+                    print "\n"+mechmach.to_s
                     mechmach.errors.full_messages.each do |message|
                       errors.add :base, "Row #{i+2}: #{message}"
                     end
                   end
                 end
               else
+                print "\nerror procesando "+row.to_s
+                print "\n"+mechsys.to_s
                 mechsys.errors.full_messages.each do |message|
                   errors.add :base, "Row #{i+2}: #{message}"
                 end
@@ -101,6 +104,8 @@ class ProjectImport
             end
             system
           else
+            print "\nerror procesando "+row.to_s
+            print "\n"+system.to_s
             system.errors.full_messages.each do |message|
               errors.add :base, "Row #{i+2}: #{message}"
             end
@@ -108,7 +113,6 @@ class ProjectImport
         end
       end
     end
-
   end
 
   def open_spreadsheet

@@ -9,7 +9,7 @@ class MechSystem < ActiveRecord::Base
   end
   attr_accessible :file_name, :atomic, :atomic_component, :mech_system_type, 
     :mech_system_type_id,:acquisition_status, :acquisition_status_id,
-    :system, :system_id, :mech_optical_surface, :mech_optical_surface_id,
+    :mech_optical_surface, :mech_optical_surface_id,
     :mech_material, :mech_material_id, :acquisition_workflow,
     :acquisition_workflow_id
   
