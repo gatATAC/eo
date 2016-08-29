@@ -341,12 +341,12 @@ class ProjectRm < ActiveRecord::Base
         i.subject = ms.to_s
         i.assigned_to  = members[:sys]
         i.status = statuses[:new]
-        i.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+        i.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
         i.description = "Issue to track " + workfltr.name+" of "+ms.to_s
         i.custom_fields = []
-        i.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+        i.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
         i.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-        i.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+        i.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
         print i.custom_fields.to_s
         done = i.save
         print "Hecho: "+done.to_s+"\n"
@@ -373,12 +373,12 @@ class ProjectRm < ActiveRecord::Base
                   iSpec.subject = "Spec " + ms.to_s
                   iSpec.assigned_to = members[:eng]
                   iSpec.status = statuses[:new]
-                  iSpec.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+                  iSpec.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
                   iSpec.description = "Issue to track " + "specification" + " of "+ms.to_s
                   iSpec.custom_fields = []
-                  iSpec.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                  iSpec.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
                   iSpec.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-                  iSpec.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+                  iSpec.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
                   iSpec.estimated_hours=8
                   print iSpec.custom_fields.to_s
                   done = iSpec.save
@@ -407,12 +407,12 @@ class ProjectRm < ActiveRecord::Base
                   iValP.subject = "VPlan "+ms.to_s
                   iValP.assigned_to = members[:valid]
                   iValP.status = statuses[:new]
-                  iValP.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+                  iValP.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
                   iValP.description = "Issue to track " + "validation plan" + " of "+ms.to_s
                   iValP.custom_fields = []
-                  iValP.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                  iValP.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
                   iValP.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-                  iValP.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+                  iValP.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
                   iValP.estimated_hours=8
                   print iValP.custom_fields.to_s
                   done = iValP.save
@@ -446,12 +446,12 @@ class ProjectRm < ActiveRecord::Base
                   iDesign.subject = ms.to_s
                   iDesign.assigned_to = members[:eng]
                   iDesign.status = statuses[:new]
-                  iDesign.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+                  iDesign.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
                   iDesign.description = "Issue to track " + "design" + " of "+ms.to_s
                   iDesign.custom_fields = []
-                  iDesign.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                  iDesign.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
                   iDesign.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-                  iDesign.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+                  iDesign.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
                   iDesign.estimated_hours=8
                   print iDesign.custom_fields.to_s
                   done = iDesign.save
@@ -486,12 +486,12 @@ class ProjectRm < ActiveRecord::Base
                 iDelin.subject = ms.to_s
                 iDelin.assigned_to = members[:delin]
                 iDelin.status = statuses[:new]
-                iDelin.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+                iDelin.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
                 iDelin.description = "Issue to track " + "delineation" + " of "+ms.to_s
                 iDelin.custom_fields = []
-                iDelin.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                iDelin.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
                 iDelin.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-                iDelin.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+                iDelin.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
                 iDelin.estimated_hours=8
                 print iDelin.custom_fields.to_s
                 done = iDelin.save
@@ -538,12 +538,12 @@ class ProjectRm < ActiveRecord::Base
                 iDelinSup.subject = "Sv Delin "+ms.to_s
                 iDelinSup.assigned_to = members[:eng]
                 iDelinSup.status = statuses[:new]
-                iDelinSup.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+                iDelinSup.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
                 iDelinSup.description = "Issue to track " + "delineation supervision" + " of "+ms.to_s
                 iDelinSup.custom_fields = []
-                iDelinSup.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+                iDelinSup.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
                 iDelinSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-                iDelinSup.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+                iDelinSup.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
                 iDelinSup.estimated_hours=8
                 print iDelinSup.custom_fields.to_s
                 done = iDelinSup.save
@@ -600,12 +600,12 @@ class ProjectRm < ActiveRecord::Base
             iManuf.subject = ms.to_s
             iManuf.status = statuses[:new]
             iManuf.assigned_to = members[:manuf]
-            iManuf.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+            iManuf.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
             iManuf.description = "Issue to track " + "manufacturing" + " of "+ms.to_s
             iManuf.custom_fields = []
-            iManuf.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+            iManuf.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
             iManuf.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-            iManuf.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+            iManuf.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
             iManuf.estimated_hours=8
             print iManuf.custom_fields.to_s
             done = iManuf.save
@@ -654,12 +654,12 @@ class ProjectRm < ActiveRecord::Base
             iManufSup.subject = "Sv Manuf "+ms.to_s
             iManufSup.assigned_to = members[:eng]
             iManufSup.status = statuses[:new]
-            iManufSup.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+            iManufSup.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
             iManufSup.description = "Issue to track " + "manufacturing supervision" + " of "+ms.to_s
             iManufSup.custom_fields = []
-            iManufSup.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+            iManufSup.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
             iManufSup.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-            iManufSup.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+            iManufSup.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
             iManufSup.estimated_hours=8
             print iManufSup.custom_fields.to_s
             done = iManufSup.save
@@ -704,12 +704,12 @@ class ProjectRm < ActiveRecord::Base
             iMetro.subject = ms.to_s
             iMetro.assigned_to  = members[:metro]
             iMetro.status = statuses[:new]
-            iMetro.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+            iMetro.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
             iMetro.description = "Issue to track " + "metrology" + " of "+ms.to_s
             iMetro.custom_fields = []
-            iMetro.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+            iMetro.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
             iMetro.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-            iMetro.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+            iMetro.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
             iMetro.estimated_hours=8
             print iMetro.custom_fields.to_s
             done = iMetro.save
@@ -780,12 +780,12 @@ class ProjectRm < ActiveRecord::Base
           iVal.subject = ms.to_s
           iVal.assigned_to = members[:valid]
           iVal.status = statuses[:new]
-          iVal.priority_id = self.calc_rm_prio(ms.system.acq_priority)
+          iVal.priority_id = self.calc_rm_prio(ms.system.hierarchical_priority)
           iVal.description = "Issue to track " + "validation" + " of "+ms.to_s
           iVal.custom_fields = []
-          iVal.custom_fields << {:name => 'eosys', :value => true, :id => self.rm_eosys}
+          iVal.custom_fields << {:name => 'eosys', :value => 1, :id => self.rm_eosys}
           iVal.custom_fields << {:name => 'eosysid', :value => ms.system.id, :id => self.rm_eosysid}
-          iVal.custom_fields << {:name => 'eosysprio', :value => ms.system.acq_priority, :id => self.rm_eosysprio}
+          iVal.custom_fields << {:name => 'eosysprio', :value => ms.system.hierarchical_priority, :id => self.rm_eosysprio}
           iVal.estimated_hours=8
           print iVal.custom_fields.to_s
           done = iVal.save
