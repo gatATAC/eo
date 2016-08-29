@@ -744,7 +744,7 @@ class ProjectRm < ActiveRecord::Base
           end
           iVal.parent=i
           iVal.subject=ms.to_s
-          iVal.assigned_to =members[:valid]
+          iVal.assigned_to = members[:valid]
           iVal.status=statuses[:new]
           iVal.priority_id=1
           iVal.description="Issue to track " + "validation" + " of "+ms.to_s

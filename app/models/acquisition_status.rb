@@ -17,7 +17,7 @@ class AcquisitionStatus < ActiveRecord::Base
   
   has_many :mech_systems, :inverse_of => :acquisition_status
 
-  children :mech_systems
+  #children :mech_systems
   
   # --- Permissions --- #
 

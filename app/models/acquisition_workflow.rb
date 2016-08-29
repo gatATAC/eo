@@ -13,7 +13,7 @@ class AcquisitionWorkflow < ActiveRecord::Base
   has_many :acquisition_statuses, :inverse_of => :acquisition_workflow,
     :dependent => :destroy
   
-  children :acquisition_statuses, :mech_systems
+  children :acquisition_statuses#, :mech_systems
   
   # --- Permissions --- #
 
