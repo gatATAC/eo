@@ -147,12 +147,34 @@
                         <xsl:if test="@virtual='true'">
                             <i>
                                 <small>
-                                    {<xsl:value-of select="@title"/>}
+                                    {<xsl:if test="@invalid='true'">
+                                [warning]
+                            </xsl:if>
+                            <xsl:if test="@remark='true'">
+                                <b><xsl:value-of select="@title"/></b>
+                            </xsl:if>
+                            <xsl:if test="not(@remark='true')">
+                                <xsl:value-of select="@title"/>
+                            </xsl:if>
+                            <xsl:if test="@invalid='true'">
+                                [warning]
+                            </xsl:if>}
                                 </small>
                             </i>
                         </xsl:if>
                         <xsl:if test="not(@virtual='true')">
-                            <xsl:value-of select="@title"/>
+                           <xsl:if test="@invalid='true'">
+                                [warning]
+                            </xsl:if>
+                            <xsl:if test="@remark='true'">
+                                <b><xsl:value-of select="@title"/></b>
+                            </xsl:if>
+                            <xsl:if test="not(@remark='true')">
+                                <xsl:value-of select="@title"/>
+                            </xsl:if>
+                            <xsl:if test="@invalid='true'">
+                                [warning]
+                            </xsl:if>
                         </xsl:if>
                     </a>					
                     <!-- Shall we expand all the leaves of the treeview ? no by default-->
@@ -276,7 +298,7 @@
                                 <img src="{@img_done}"/>
                             </xsl:if>
                             <xsl:if test="@invalid='true'">
-                                <del>
+                                [warning]
                             </xsl:if>
                             <xsl:if test="@remark='true'">
                                 <b><xsl:value-of select="@title"/></b>
@@ -285,7 +307,7 @@
                                 <xsl:value-of select="@title"/>
                             </xsl:if>
                             <xsl:if test="@invalid='true'">
-                                </del>
+                                [warning]
                             </xsl:if>
                         </xsl:if>
                     </a>
