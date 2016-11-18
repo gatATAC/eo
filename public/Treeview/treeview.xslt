@@ -275,11 +275,17 @@
                             <xsl:if test="@img_done!=''">
                                 <img src="{@img_done}"/>
                             </xsl:if>
+                            <xsl:if test="@invalid='true'">
+                                <del>
+                            </xsl:if>
                             <xsl:if test="@remark='true'">
                                 <b><xsl:value-of select="@title"/></b>
                             </xsl:if>
                             <xsl:if test="not(@remark='true')">
                                 <xsl:value-of select="@title"/>
+                            </xsl:if>
+                            <xsl:if test="@invalid='true'">
+                                </del>
                             </xsl:if>
                         </xsl:if>
                     </a>

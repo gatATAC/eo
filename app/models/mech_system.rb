@@ -4,15 +4,12 @@ class MechSystem < ActiveRecord::Base
 
   fields do
     file_name        :string
+    id_plm    :string
+    id_work   :integer
     version   :string
     timestamps
   end
-  attr_accessible :file_name, :atomic, :atomic_component, :mech_system_type, 
-    :mech_system_type_id,:acquisition_status, :acquisition_status_id,
-    :mech_optical_surface, :mech_optical_surface_id,
-    :mech_material, :mech_material_id, :acquisition_workflow,
-    :acquisition_workflow_id
-  
+
   belongs_to :system, :inverse_of => :mech_systems, :creator => :true
   
   belongs_to :mech_system_type, :inverse_of => :mech_systems
@@ -21,6 +18,12 @@ class MechSystem < ActiveRecord::Base
   belongs_to :acquisition_workflow, :inverse_of => :mech_systems
   belongs_to :acquisition_status, :inverse_of => :mech_systems
 
+  attr_accessible :file_name, :atomic, :atomic_component, :mech_system_type, 
+    :mech_system_type_id,:acquisition_status, :acquisition_status_id,
+    :mech_optical_surface, :mech_optical_surface_id,
+    :mech_material, :mech_material_id, :acquisition_workflow,
+    :acquisition_workflow_id, :id_plm, :id_work
+  
   has_many :mech_system_fab_machines, :inverse_of => :mech_system, 
     :dependent => :destroy
   
@@ -53,6 +56,16 @@ class MechSystem < ActiveRecord::Base
     end
     return ret
   end
+
+  def is_invalid
+    if (self.acquisition_status == nil) then
+      ret=true
+    else
+      ret = (self.acquisition_status.acquisition_workflow != self.acquisition_workflow)
+    end
+    return ret
+  end
+
   # --- Permissions --- #
 
   def create_permitted?

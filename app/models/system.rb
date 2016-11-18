@@ -493,6 +493,11 @@ class System < ActiveRecord::Base
           virtstr="false"
         end
         remarkstr=""
+        if ( self.is_invalid ) then
+          invalidstr = "true"
+        else
+          invalidstr = "false"
+        end
         if (nodetype==:folder) then
           doc.folder title:""+self.name,
             type:"systems",
@@ -502,6 +507,7 @@ class System < ActiveRecord::Base
             img_done:img_path_done,
             virtual:virtstr,
             remark:remarkstr,
+            invalid:invalidstr,
             action:""+self.id.to_s do
 =begin
     self.state_machines.each {|sm|
@@ -530,6 +536,7 @@ class System < ActiveRecord::Base
             img_done:img_path_done,
             virtual:virtstr,
             remark:remarkstr,
+            invalid:invalidstr,
             action:""+self.id.to_s do
           end
         end
@@ -566,6 +573,11 @@ class System < ActiveRecord::Base
           else
             remarkstr = "false"
           end
+          if ( self.is_invalid ) then
+            invalidstr = "true"
+          else
+            invalidstr = "false"
+          end
           if (nodetype==:folder) then
             doc.folder title:""+self.name,
               type:"systems",
@@ -575,6 +587,7 @@ class System < ActiveRecord::Base
               img_done:img_path_done,
               virtual:virtstr,
               remark:remarkstr,
+              invalid:invalidstr,
               expanded:true,
               priority:self.hierarchical_priority,
               action:""+self.id.to_s do
@@ -607,6 +620,7 @@ class System < ActiveRecord::Base
               img_done:img_path_done,
               virtual:virtstr,
               remark:remarkstr,
+              invalid:invalidstr,
               priority:self.hierarchical_priority,
               action:""+self.id.to_s do
             end
@@ -623,6 +637,13 @@ class System < ActiveRecord::Base
       return ret
     end
   
+    def is_invalid
+      ret = false
+      self.mech_systems.each{|ms|
+        ret = ret || ms.is_invalid
+      }
+      return ret
+    end
     # --- Permissions --- #
 
     def create_permitted?
