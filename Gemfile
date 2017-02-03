@@ -87,6 +87,8 @@ gem 'raphael-rails'
 
 gem 'redmine_rest'
 
+gem 'activeresource'
+
 ######## To dump database
 gem 'yaml_db'
 

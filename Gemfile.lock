@@ -220,6 +220,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activeresource
   acts_as_list
   byebug
   chartkick
@@ -250,3 +251,6 @@ DEPENDENCIES
   uglifier (>= 1.3.0)
   web-console (~> 2.0)
   yaml_db
+
+BUNDLED WITH
+   1.12.5
