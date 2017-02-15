@@ -4,8 +4,8 @@ class MechSystem < ActiveRecord::Base
 
   fields do
     file_name        :string
-    id_plm    :string
-    id_work   :integer
+    id_plm_dis    :string
+    id_plm_del   :string
     version   :string
     timestamps
   end
@@ -22,7 +22,7 @@ class MechSystem < ActiveRecord::Base
     :mech_system_type_id,:acquisition_status, :acquisition_status_id,
     :mech_optical_surface, :mech_optical_surface_id,
     :mech_material, :mech_material_id, :acquisition_workflow,
-    :acquisition_workflow_id, :id_plm, :id_work
+    :acquisition_workflow_id, :id_plm_dis, :id_plm_del
   
   has_many :mech_system_fab_machines, :inverse_of => :mech_system, 
     :dependent => :destroy

@@ -179,7 +179,7 @@
                     </a>					
                     <!-- Shall we expand all the leaves of the treeview ? no by default-->
                     <xsl:if test="@action">
-                        <img src="/images/arrow.png" >
+                        <img src="../../images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
                                     <xsl:with-param name="text" select="@action"/>
                                     <xsl:with-param name="from" select="$var-simple-quote"/>
@@ -312,7 +312,7 @@
                         </xsl:if>
                     </a>
                     <xsl:if test="@action">
-                        <img src="/images/arrow.png" >
+                        <img src="../../images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
                                     <xsl:with-param name="text" select="@action"/>
                                     <xsl:with-param name="from" select="$var-simple-quote"/>

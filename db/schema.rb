@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160831083635) do
+ActiveRecord::Schema.define(version: 20170215171803) do
 
   create_table "acquisition_statuses", force: :cascade do |t|
     t.string   "name"
@@ -149,8 +149,8 @@ ActiveRecord::Schema.define(version: 20160831083635) do
     t.integer  "mech_material_id"
     t.integer  "acquisition_workflow_id"
     t.integer  "acquisition_status_id"
-    t.string   "id_plm"
-    t.integer  "id_work"
+    t.string   "id_plm_dis"
+    t.string   "id_plm_del"
   end
 
   add_index "mech_systems", ["acquisition_status_id"], name: "index_mech_systems_on_acquisition_status_id"
