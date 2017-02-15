@@ -547,7 +547,7 @@ class System < ActiveRecord::Base
     
     def url_root
       if ENV['RAILS_RELATIVE_URL_ROOT']
-        return "/"+ENV['RAILS_RELATIVE_URL_ROOT']+"/"
+        return ENV['RAILS_RELATIVE_URL_ROOT']+"/"
       else
         return "/"
       end
