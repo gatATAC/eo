@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
   
   def self.url_root
       if ENV['RAILS_RELATIVE_URL_ROOT']
-        return "/"+ENV['RAILS_RELATIVE_URL_ROOT']
+        return ENV['RAILS_RELATIVE_URL_ROOT']+"/"
       else
         return ""
       end
