@@ -393,7 +393,7 @@ class System < ActiveRecord::Base
       if (allowed)
         # Create the XML tree
         b = Nokogiri::XML::Builder.new do |doc|
-          #<!DOCTYPE treeview SYSTEM "/Treeview/treeview.dtd">
+          #<!DOCTYPE treeview SYSTEM "../../Treeview/treeview.dtd">
           doc.doc.create_internal_subset(
             'treeview',
             nil,
@@ -402,7 +402,7 @@ class System < ActiveRecord::Base
           self.to_tree_int_pending(doc,u)
         end
         xmldoc = b.doc
-        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="Treeview/treeview.xslt"')
+        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="../../Treeview/treeview.xslt"')
         xmldoc.root.add_previous_sibling treexsl
         return b.to_xml
       else
@@ -416,7 +416,7 @@ class System < ActiveRecord::Base
       if (allowed)
         # Create the XML tree
         b = Nokogiri::XML::Builder.new do |doc|
-          #<!DOCTYPE treeview SYSTEM "Treeview/treeview.dtd">
+          #<!DOCTYPE treeview SYSTEM "../../Treeview/treeview.dtd">
           doc.doc.create_internal_subset(
             'treeview',
             nil,
@@ -425,7 +425,7 @@ class System < ActiveRecord::Base
           self.to_tree_int(doc,u)
         end
         xmldoc = b.doc
-        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="Treeview/treeview.xslt"')
+        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="../../Treeview/treeview.xslt"')
         xmldoc.root.add_previous_sibling treexsl
         return b.to_xml
       else
