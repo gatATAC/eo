@@ -41,7 +41,7 @@
                 <link rel="stylesheet" href="../Treeview/treeview.css" type="text/css"/>
                 <!-- Warning, if you use-->
                 <script src="../Treeview/treeview.js" language="javascript" type="text/javascript"/>
-                <script src="../../assets/application.js" language="javascript" type="text/javascript"/>
+                <script src="../assets/application.js" language="javascript" type="text/javascript"/>
             </head>
             <body>
                 <table border="0" cellspacing="0" cellpadding="0">
@@ -179,7 +179,7 @@
                     </a>					
                     <!-- Shall we expand all the leaves of the treeview ? no by default-->
                     <xsl:if test="@action">
-                        <img src="../../images/arrow.png" >
+                        <img src="../images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
                                     <xsl:with-param name="text" select="@action"/>
                                     <xsl:with-param name="from" select="$var-simple-quote"/>
@@ -312,7 +312,7 @@
                         </xsl:if>
                     </a>
                     <xsl:if test="@action">
-                        <img src="../../images/arrow.png" >
+                        <img src="../images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
                                     <xsl:with-param name="text" select="@action"/>
                                     <xsl:with-param name="from" select="$var-simple-quote"/>
