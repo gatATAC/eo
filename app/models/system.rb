@@ -397,12 +397,12 @@ class System < ActiveRecord::Base
           doc.doc.create_internal_subset(
             'treeview',
             nil,
-            ApplicationController.url_root+"/Treeview/treeview.dtd"
+            SystemsController.url_root+"/Treeview/treeview.dtd"
           )
           self.to_tree_int_pending(doc,u)
         end
         xmldoc = b.doc
-        treestr = 'type="text/xsl" href="'+ApplicationController.url_root+'/Treeview/treeview.xslt"'
+        treestr = 'type="text/xsl" href="'+SystemsController.url_root+'/Treeview/treeview.xslt"'
         treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", treestr)
         xmldoc.root.add_previous_sibling treexsl
         return b.to_xml
@@ -421,12 +421,12 @@ class System < ActiveRecord::Base
           doc.doc.create_internal_subset(
             'treeview',
             nil,
-            ApplicationController.url_root+"/Treeview/treeview.dtd"
+            SystemsController.url_root+"/Treeview/treeview.dtd"
           )
           self.to_tree_int(doc,u)
         end
         xmldoc = b.doc
-        treestr = 'type="text/xsl" href="'+ApplicationController.url_root+'/Treeview/treeview.xslt"'
+        treestr = 'type="text/xsl" href="'+SystemsController.url_root+'/Treeview/treeview.xslt"'
         treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", treestr)
         xmldoc.root.add_previous_sibling treexsl
         return b.to_xml
@@ -473,19 +473,19 @@ class System < ActiveRecord::Base
     def get_tree_data_xml_ss(doc,u)
       if self.viewable_by?(u) then
         if (self.children.size>=1) then
-          img_path=ApplicationController.url_root+"/images/nodes/subsystem.png"
+          img_path=SystemsController.url_root+"/images/nodes/subsystem.png"
           nodetype=:folder
         else
-          img_path=ApplicationController.url_root+"/images/nodes/component.png"
+          img_path=SystemsController.url_root+"/images/nodes/component.png"
           nodetype=:leaf
         end
         if (self.is_part_of_atomic) then
-          img_path_atom=ApplicationController.url_root+"/images/nodes/atom.png"
+          img_path_atom=SystemsController.url_root+"/images/nodes/atom.png"
         else
           img_path_atom=""
         end
         if (self.is_part_of_acquired) then
-          img_path_done=ApplicationController.url_root+"/images/nodes/done.png"
+          img_path_done=SystemsController.url_root+"/images/nodes/done.png"
         else
           img_path_done=""
         end
@@ -507,7 +507,7 @@ class System < ActiveRecord::Base
             img:img_path,
             img_atom:img_path_atom,
             img_done:img_path_done,
-            img_path:ApplicationController.url_root,
+            img_path:SystemsController.url_root,
             virtual:virtstr,
             remark:remarkstr,
             invalid:invalidstr,
@@ -537,7 +537,7 @@ class System < ActiveRecord::Base
             img:img_path,
             img_atom:img_path_atom,
             img_done:img_path_done,
-            img_path:ApplicationController.url_root,
+            img_path:SystemsController.url_root,
             virtual:virtstr,
             remark:remarkstr,
             invalid:invalidstr,
@@ -551,19 +551,19 @@ class System < ActiveRecord::Base
       if self.viewable_by?(u) then
         if (not(self.is_part_of_acquired) && not(self.is_part_of_virtual)) then
           if (self.children.size>=1) then
-            img_path=ApplicationController.url_root+"/images/nodes/subsystem.png"
+            img_path=SystemsController.url_root+"/images/nodes/subsystem.png"
             nodetype=:folder
           else
-            img_path=ApplicationController.url_root+"/images/nodes/component.png"
+            img_path=SystemsController.url_root+"/images/nodes/component.png"
             nodetype=:leaf
           end
           if (self.is_part_of_atomic) then
-            img_path_atom=ApplicationController.url_root+"/images/nodes/atom.png"
+            img_path_atom=SystemsController.url_root+"/images/nodes/atom.png"
           else
             img_path_atom=""
           end
           if (self.is_part_of_acquired) then
-            img_path_done=ApplicationController.url_root+"/images/nodes/done.png"
+            img_path_done=SystemsController.url_root+"/images/nodes/done.png"
           else
             img_path_done=""
           end
@@ -589,7 +589,7 @@ class System < ActiveRecord::Base
               img:img_path,
               img_atom:img_path_atom,
               img_done:img_path_done,
-              img_path:ApplicationController.url_root,
+              img_path:SystemsController.url_root,
               virtual:virtstr,
               remark:remarkstr,
               invalid:invalidstr,
@@ -623,7 +623,7 @@ class System < ActiveRecord::Base
               img:img_path,
               img_atom:img_path_atom,
               img_done:img_path_done,
-              img_path:ApplicationController.url_root,
+              img_path:SystemsController.url_root,
               virtual:virtstr,
               remark:remarkstr,
               invalid:invalidstr,
