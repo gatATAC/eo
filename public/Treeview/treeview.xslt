@@ -41,7 +41,7 @@
                 <link rel="stylesheet" href="../Treeview/treeview.css" type="text/css"/>
                 <!-- Warning, if you use-->
                 <script src="../Treeview/treeview.js" language="javascript" type="text/javascript"/>
-                <script src="../assets/application.js" language="javascript" type="text/javascript"/>
+                <script src="assets/application.js" language="javascript" type="text/javascript"/>
             </head>
             <body>
                 <table border="0" cellspacing="0" cellpadding="0">
