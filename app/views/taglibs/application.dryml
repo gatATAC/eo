@@ -7,7 +7,7 @@ you can place common code in this file. -->
   </div>
 </def>
 
-<def tag="app-name"><img src="images/gatatac.png"/>Eo Systems</def>
+<def tag="app-name"><img src="#{ApplicationController.url_root}/images/gatatac.png"/>Eo Systems</def>
 
 <def tag="eofooter">
   <div class="eofooter" param>

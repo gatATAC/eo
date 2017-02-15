@@ -23,7 +23,7 @@
     <!-- hozizontale distance in pixels between a folder and its leaves -->
     <xsl:param name="param-shift-width" select="15"/>
     <!-- image source directory-->
-    <xsl:param name="param-img-directory" select="'../Treeview/'"/>
+    <xsl:param name="param-img-directory" select="'/Treeview/'"/>
     <!-- ************************************ Variables ************************************ -->
     <xsl:variable name="var-simple-quote">'</xsl:variable>
     <xsl:variable name="var-slash-quote">\'</xsl:variable>
@@ -86,19 +86,19 @@
                         <!-- If the treeview is unfold, the image minus (-) is displayed-->
                         <xsl:if test="@expanded">
                             <xsl:if test="@expanded='true'">
-                                <img src="{$param-img-directory}minus.gif" />
+                                <img src="{@img_root}{$param-img-directory}minus.gif" />
                             </xsl:if>
                             <!-- plus (+) otherwise-->
                             <xsl:if test="@expanded='false'">
-                                <img src="{$param-img-directory}plus.gif" />
+                                <img src="{@img_root}{$param-img-directory}plus.gif" />
                             </xsl:if>
                         </xsl:if>
                         <xsl:if test="not(@expanded)">
                             <xsl:if test="$param-deploy-treeview = 'true'">
-                                <img src="{$param-img-directory}minus.gif" />
+                                <img src="{@img_root}{$param-img-directory}minus.gif" />
                             </xsl:if>
                             <xsl:if test="$param-deploy-treeview = 'false' or not(@expanded)">
-                                <img src="{$param-img-directory}plus.gif" />
+                                <img src="{@img_root}{$param-img-directory}plus.gif" />
                             </xsl:if>
                         </xsl:if>
                         <xsl:if test="@priority">
@@ -179,7 +179,7 @@
                     </a>					
                     <!-- Shall we expand all the leaves of the treeview ? no by default-->
                     <xsl:if test="@action">
-                        <img src="../images/arrow.png" >
+                        <img src="{@img_root}/images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
                                     <xsl:with-param name="text" select="@action"/>
                                     <xsl:with-param name="from" select="$var-simple-quote"/>
@@ -257,10 +257,10 @@
                         <!-- if it is the last leaf, print a different image for the link to the folder-->
                         <xsl:choose>
                             <xsl:when test="position()=last()">
-                                <img src="{$param-img-directory}lastlink.gif" />
+                                <img src="{@img_root}{$param-img-directory}lastlink.gif" />
                             </xsl:when>
                             <xsl:otherwise>
-                                <img src="{$param-img-directory}link.gif" />
+                                <img src="{@img_root}{$param-img-directory}link.gif" />
                             </xsl:otherwise>
                         </xsl:choose>
                         <xsl:if test="@priority">
@@ -312,7 +312,7 @@
                         </xsl:if>
                     </a>
                     <xsl:if test="@action">
-                        <img src="../images/arrow.png" >
+                        <img src="{@img_root}/images/arrow.png" >
                             <xsl:attribute name="onclick">selectAction(<xsl:call-template name="replace-string">
                                     <xsl:with-param name="text" select="@action"/>
                                     <xsl:with-param name="from" select="$var-simple-quote"/>

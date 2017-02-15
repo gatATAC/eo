@@ -13,4 +13,12 @@ class ApplicationController < ActionController::Base
     end
     Rails.application.routes.default_url_options = { :host => @host}
   end  
+  
+  def self.url_root
+      if ENV['RAILS_RELATIVE_URL_ROOT']
+        return "/"+ENV['RAILS_RELATIVE_URL_ROOT']
+      else
+        return ""
+      end
+  end
 end
