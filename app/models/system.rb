@@ -397,7 +397,7 @@ class System < ActiveRecord::Base
           doc.doc.create_internal_subset(
             'treeview',
             nil,
-            "Treeview/treeview.dtd"
+            "../../Treeview/treeview.dtd"
           )
           self.to_tree_int_pending(doc,u)
         end
@@ -420,7 +420,7 @@ class System < ActiveRecord::Base
           doc.doc.create_internal_subset(
             'treeview',
             nil,
-            "Treeview/treeview.dtd"
+            "../../Treeview/treeview.dtd"
           )
           self.to_tree_int(doc,u)
         end
