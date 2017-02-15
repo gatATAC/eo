@@ -393,16 +393,17 @@ class System < ActiveRecord::Base
       if (allowed)
         # Create the XML tree
         b = Nokogiri::XML::Builder.new do |doc|
-          #<!DOCTYPE treeview SYSTEM "../Treeview/treeview.dtd">
+          #<!DOCTYPE treeview SYSTEM "Treeview/treeview.dtd">
           doc.doc.create_internal_subset(
             'treeview',
             nil,
-            "../Treeview/treeview.dtd"
+            url_root+"Treeview/treeview.dtd"
           )
           self.to_tree_int_pending(doc,u)
         end
         xmldoc = b.doc
-        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="../Treeview/treeview.xslt"')
+        treestr = 'type="text/xsl" href="'+url_root+'Treeview/treeview.xslt"'
+        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", treestr)
         xmldoc.root.add_previous_sibling treexsl
         return b.to_xml
       else
@@ -416,16 +417,17 @@ class System < ActiveRecord::Base
       if (allowed)
         # Create the XML tree
         b = Nokogiri::XML::Builder.new do |doc|
-          #<!DOCTYPE treeview SYSTEM "../Treeview/treeview.dtd">
+          #<!DOCTYPE treeview SYSTEM "Treeview/treeview.dtd">
           doc.doc.create_internal_subset(
             'treeview',
             nil,
-            "../Treeview/treeview.dtd"
+            url_root+"Treeview/treeview.dtd"
           )
           self.to_tree_int(doc,u)
         end
         xmldoc = b.doc
-        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", 'type="text/xsl" href="../Treeview/treeview.xslt"')
+        treestr = 'type="text/xsl" href="'+url_root+'Treeview/treeview.xslt"'
+        treexsl = Nokogiri::XML::ProcessingInstruction.new(xmldoc, "xml-stylesheet", treestr)
         xmldoc.root.add_previous_sibling treexsl
         return b.to_xml
       else
@@ -471,19 +473,19 @@ class System < ActiveRecord::Base
     def get_tree_data_xml_ss(doc,u)
       if self.viewable_by?(u) then
         if (self.children.size>=1) then
-          img_path="../images/nodes/subsystem.png"
+          img_path=url_root+"images/nodes/subsystem.png"
           nodetype=:folder
         else
-          img_path="../images/nodes/component.png"
+          img_path=url_root+"images/nodes/component.png"
           nodetype=:leaf
         end
         if (self.is_part_of_atomic) then
-          img_path_atom="../images/nodes/atom.png"
+          img_path_atom=url_root+"images/nodes/atom.png"
         else
           img_path_atom=""
         end
         if (self.is_part_of_acquired) then
-          img_path_done="../images/nodes/done.png"
+          img_path_done=url_root+"images/nodes/done.png"
         else
           img_path_done=""
         end
@@ -542,24 +544,32 @@ class System < ActiveRecord::Base
         end
       end
     end
+    
+    def url_root
+      if ENV['RAILS_RELATIVE_URL_ROOT']
+        return "/"+ENV['RAILS_RELATIVE_URL_ROOT']
+      else
+        return "/"
+      end
+    end
 
     def get_tree_data_xml_ss_pending(doc,u)
       if self.viewable_by?(u) then
         if (not(self.is_part_of_acquired) && not(self.is_part_of_virtual)) then
           if (self.children.size>=1) then
-            img_path="../images/nodes/subsystem.png"
+            img_path=url_root+"/images/nodes/subsystem.png"
             nodetype=:folder
           else
-            img_path="../images/nodes/component.png"
+            img_path=url_root+"images/nodes/component.png"
             nodetype=:leaf
           end
           if (self.is_part_of_atomic) then
-            img_path_atom="../images/nodes/atom.png"
+            img_path_atom=url_root+"images/nodes/atom.png"
           else
             img_path_atom=""
           end
           if (self.is_part_of_acquired) then
-            img_path_done="../images/nodes/done.png"
+            img_path_done=url_root+"images/nodes/done.png"
           else
             img_path_done=""
           end
