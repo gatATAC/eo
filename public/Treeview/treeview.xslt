@@ -23,7 +23,7 @@
     <!-- hozizontale distance in pixels between a folder and its leaves -->
     <xsl:param name="param-shift-width" select="15"/>
     <!-- image source directory-->
-    <xsl:param name="param-img-directory" select="'/Treeview/'"/>
+    <xsl:param name="param-img-directory" select="'../../Treeview/'"/>
     <!-- ************************************ Variables ************************************ -->
     <xsl:variable name="var-simple-quote">'</xsl:variable>
     <xsl:variable name="var-slash-quote">\'</xsl:variable>
@@ -38,10 +38,10 @@
         <!-- -->
         <html>
             <head>
-                <link rel="stylesheet" href="/Treeview/treeview.css" type="text/css"/>
+                <link rel="stylesheet" href="../../Treeview/treeview.css" type="text/css"/>
                 <!-- Warning, if you use-->
-                <script src="/Treeview/treeview.js" language="javascript" type="text/javascript"/>
-                <script src="/assets/application.js" language="javascript" type="text/javascript"/>
+                <script src="../../Treeview/treeview.js" language="javascript" type="text/javascript"/>
+                <script src="../../assets/application.js" language="javascript" type="text/javascript"/>
             </head>
             <body>
                 <table border="0" cellspacing="0" cellpadding="0">
